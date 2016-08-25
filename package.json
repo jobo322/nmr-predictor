@@ -20,10 +20,12 @@
     "cheminfo-tools": "^1.5.0",
     "mocha": "^2.5.1",
     "mocha-better-spec-reporter": "^3.0.2",
-    "should": "^9.0.2"
+    "should": "^9.0.2",
+    "request": "2.72.0"
   },
   "dependencies": {
-    "openchemlib-extended":"1.5.0",
-    "ml-matrix": "^1.1.2"
+    "openchemlib-extended":"1.9.0",
+    "ml-matrix": "^1.1.2",
+    "new-array": "^1.0.0"
   }
 }
