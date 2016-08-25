@@ -1,0 +1,33 @@
+{
+  "name": "nmr-predictor",
+  "version": "0.0.1",
+  "main": [
+    "dist/nmr-predictor.js"
+  ],
+  "homepage": "https://github.com/cheminfo-js/nmr-predictor#readme",
+  "authors": [
+    "andcastillo"
+  ],
+  "description": "NMR chemical shift predictor",
+  "moduleType": [
+    "amd",
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "nmr",
+    "simulation",
+    "simulator",
+    "predictor",
+    "spinus",
+    "nmrshiftdb",
+    "rmn",
+    "spin",
+    "system"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "/*",
+    "!dist/*"
+  ]
+}
