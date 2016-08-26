@@ -184,6 +184,7 @@ class NmrPredictor {
             }
         }
 
+        //Average the entries for the equivalent protons
         var idsKeys = Object.keys(ids);
         for (i = 0;i < nspins; i++) {
             tmpCS = csByOclID[atoms[idsKeys[i]]].cs/csByOclID[atoms[idsKeys[i]]].nc;
@@ -200,8 +201,6 @@ class NmrPredictor {
                 }
             }
         }
-
-        //Average the entries for the equivalent protons
 
         return result;
     }

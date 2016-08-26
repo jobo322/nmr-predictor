@@ -49,7 +49,7 @@ describe('Spinus prediction', function () {
             var prediction = predictor.predict(molfile, body);
             prediction.length.should.eql(10);
             //console.log("Spinus prediction ");
-            console.log(prediction);
+            console.log(JSON.stringify(prediction));
         //});
     });
 });
