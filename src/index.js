@@ -6,7 +6,7 @@ const OCLE = require('openchemlib-extended');
 
 const Matrix = require('ml-matrix');
 const newArray = require('new-array');
-const defaultOptions = {nucleus:"H"};
+const defaultOptions = {atomLabel:"H"};
 class NmrPredictor {
 
     constructor(db) {
@@ -61,9 +61,9 @@ class NmrPredictor {
      * @returns    +Object an array of NMRSignal1D
      */
     _askErno(mol, opt) {
-        const options = Object.assign({},defaultOptions, opt);
+        const options = Object.assign({}, defaultOptions, opt);
         var currentDB = null;
-        const nucleus = options.nucleus || "H";
+        const atomLabel = options.atomLabel || "H";
         if (options.db) {
             currentDB = options.db;
         }
@@ -80,7 +80,7 @@ class NmrPredictor {
             return b - a;
         });
 
-        var diaIDs = mol.getGroupedDiastereotopicAtomIDs({atomLabel:nucleus});
+        var diaIDs = mol.getGroupedDiastereotopicAtomIDs({atomLabel:atomLabel});
         var infoCOSY = [];//mol.getCouplings();
         if(couplings) {
             //    infoCOSY = mol.predictCouplings();
@@ -119,6 +119,7 @@ class NmrPredictor {
             if (res == null) {
                 res = { cs: -9999999, ncs: 0, std: 0, min: 0, max: 0 };//Default values
             }
+            atom.atomLabel = atomLabel;
             atom.level = levels[k-1];
             atom.delta = res.cs;
             atom.integral = 1;
@@ -206,7 +207,7 @@ class NmrPredictor {
         for (i = 0;i < nspins; i++) {
             tmpCS = csByOclID[atoms[idsKeys[i]]].cs/csByOclID[atoms[idsKeys[i]]].nc;
             result[i] = {atomIDs:[idsKeys[i]], diaIDs:[atoms[idsKeys[i]]], integral:integrals[i],
-                delta:tmpCS, j:[]};
+                delta:tmpCS, atomLabel: "H", j:[]};
             for (j=0; j < nspins; j++) {
                 if(jc[i][j] !== 0 ) {
                     result[i].j.push({
