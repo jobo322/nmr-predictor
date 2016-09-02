@@ -1,9 +1,11 @@
 {
   "name": "nmr-predictor",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "NMR chemical shift predictor",
   "keywords": [],
-  "files": ["src"],
+  "files": [
+    "src"
+  ],
   "author": "andcastillo",
   "repository": "cheminfo-js/nmr-predictor",
   "bugs": {
@@ -24,7 +26,7 @@
     "request": "2.72.0"
   },
   "dependencies": {
-    "openchemlib-extended":"1.9.1",
+    "openchemlib-extended": "1.9.0",
     "ml-matrix": "^1.1.2",
     "new-array": "^1.0.0"
   }
