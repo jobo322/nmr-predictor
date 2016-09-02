@@ -7,7 +7,8 @@ const OCLE = require('openchemlib-extended');
 const Matrix = require('ml-matrix');
 const newArray = require('new-array');
 const defaultOptions = {nucleus:"H"};
-class NmrPredictor {
+
+class NmrPredictor2D {
 
     constructor(db) {
         this.db = db;
@@ -24,34 +25,17 @@ class NmrPredictor {
             mol = OCLE.Molecule.fromMolfile(molfile);
             mol.addImplicitHydrogens();
         }
-        var prediction;
+
         if(typeof this.db === "object") {
-            prediction = this._askErno(mol, param1);
+            return this._askErno(mol, param1);
         }
         if(this.db === "spinus") {
             //The molfile whitout hydrogens
-            prediction = this._fromSpinus(mol, param1, param2);
+            return this._fromSpinus(mol, param1, param2);
         }
         if(this.db === "nmrshiftdb2") {
-            prediction = this._fromNnmrshiftdb2(mol, param1);
+            return this._fromNnmrshiftdb2(mol, param1);
         }
-
-        if(param1 && param1.group||param2 && param2.group){
-            prediction.sort(function(a, b) {
-                if(a.diaIDs[0] < b.diaIDs[0]) return -1;
-                if(a.diaIDs[0] > b.diaIDs[0]) return 1;
-                return 0;
-            });
-            for(var i = prediction.length-2; i >= 0; i--){
-                if(prediction[i].diaIDs[0]===prediction[i+1].diaIDs[0]){
-                    prediction[i].integral+=prediction[i+1].integral;
-                    prediction[i].atomIDs=prediction[i].atomIDs.concat(prediction[i+1].atomIDs);
-                    prediction.splice(i+1,1);
-                }
-            }
-        }
-
-        return prediction;
     }
 
     /**
