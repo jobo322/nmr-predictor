@@ -6,7 +6,7 @@ const OCLE = require('openchemlib-extended');
 
 const Matrix = require('ml-matrix');
 const newArray = require('new-array');
-const defaultOptions = {atomLabel:"H"};
+const defaultOptions = {atomLabel:"H", ignoreLabile: true};
 class NmrPredictor {
 
     constructor(db) {
@@ -146,11 +146,21 @@ class NmrPredictor {
         }
         //TODO this will not work because getPaths is not implemented yet!!!!
         if(options.ignoreLabile) {
-            var linksOH = mol.getPaths(1,1,"H","O",false);
-            var linksNH = mol.getPaths(1,1,"H","N",false);
+            var linksOH = mol.getAllPaths({
+                fromLabel: 'H',
+                toLabel: 'O',
+                minLength: 1,
+                maxLength: 1
+            });
+            var linksNH = mol.getAllPaths({
+                fromLabel: 'H',
+                toLabel: 'N',
+                minLength: 1,
+                maxLength: 1
+            });
             for(j = toReturn.length-1; j >= 0; j--) {
                 for(var k = 0; k < linksOH.length; k++) {
-                    if(toReturn[j].diaIDs[0] == linksOH[k].diaID1) {
+                    if(toReturn[j].diaIDs[0] == linksOH[k].fromDiaID) {
                         toReturn.splice(j,1);
                         break;
                     }
@@ -159,7 +169,7 @@ class NmrPredictor {
             //console.log(h1pred.length);
             for(j = toReturn.length-1; j >= 0; j--) {
                 for(var k = 0;k < linksNH.length; k++) {
-                    if(toReturn[j].diaIDs[0] == linksNH[k].diaID1) {
+                    if(toReturn[j].diaIDs[0] == linksNH[k].fromDiaID) {
                         toReturn.splice(j,1);
                         break;
                     }
