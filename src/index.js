@@ -224,13 +224,29 @@ class NmrPredictor {
                         "assignment": idsKeys[j],
                         "diaID": atoms[ids[j]],
                         "coupling": jc[i][j],
-                        "multiplicity": multiplicity[j]
+                        "multiplicity": _multiplicityToString(multiplicity[j])
                     });
                 }
             }
         }
 
         return result;
+    }
+
+    _multiplicityToString(mul){
+        switch(mul) {
+            case 2:
+                return "d";
+                break;
+            case 3:
+                return "t";
+                break;
+            case 4:
+                return "q";
+                break;
+            default:
+                return "";
+        }
     }
 
     _spinusParser(result){
