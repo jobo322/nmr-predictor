@@ -224,7 +224,7 @@ class NmrPredictor {
                         "assignment": idsKeys[j],
                         "diaID": atoms[ids[j]],
                         "coupling": jc[i][j],
-                        "multiplicity": _multiplicityToString(multiplicity[j])
+                        "multiplicity": this._multiplicityToString(multiplicity[j])
                     });
                 }
             }

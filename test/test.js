@@ -56,7 +56,7 @@ describe('Spinus prediction', function () {
         //request.post("http://www.nmrdb.org/service/predictor", {form: {molfile: molfile}}, function (error, response, body) {
         var predictor = new NmrPredictor("spinus");
         var prediction = predictor.predict(molfile, body, {group:true});
-        //console.log(prediction);
+        //console.log(JSON.stringify(prediction));
 
         prediction.length.should.eql(5);
         //console.log("Spinus prediction ");
