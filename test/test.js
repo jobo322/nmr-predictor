@@ -43,25 +43,19 @@ const body = `9	1	7.260	4	14	6	3.507	15	7	0.000	10	2	7.718	11	3	7.758
 `;
 
 describe('Spinus prediction', function () {
-    it('1H chemical shift prediction expanded', function () {
-        //request.post("http://www.nmrdb.org/service/predictor", {form: {molfile: molfile}}, function (error, response, body) {
+    it('1H chemical shift prediction expanded', function (done) {
             var predictor = new NmrPredictor("spinus");
-            var prediction = predictor.predict(molfile, body);
-            prediction.length.should.eql(10);
-            //console.log("Spinus prediction ");
-            //console.log(JSON.stringify(prediction));
-        //});
+            predictor.predict(molfile).then(prediction => {
+                prediction.length.should.eql(10);
+                done();
+            });
     });
-    it('1H chemical shift prediction grouped', function () {
-        //request.post("http://www.nmrdb.org/service/predictor", {form: {molfile: molfile}}, function (error, response, body) {
+    it('1H chemical shift prediction grouped', function (done) {
         var predictor = new NmrPredictor("spinus");
-        var prediction = predictor.predict(molfile, body, {group:true});
-        //console.log(JSON.stringify(prediction));
-
-        prediction.length.should.eql(5);
-        //console.log("Spinus prediction ");
-        //console.log(JSON.stringify(prediction));
-        //});
+        predictor.predict(molfile, {group:true}).then(prediction => {
+            prediction.length.should.eql(5);
+            done()
+        });
     });
 });
 
@@ -71,15 +65,11 @@ describe('Ask Erno prediction', function () {
         var predictor = new NmrPredictor(db);
         var prediction = predictor.predict(molfile);
         prediction.length.should.eql(10);
-        //console.log("Ask Erno prediction ");
-        //console.log(prediction);
     });
 
     it('1H chemical shift prediction grouped', function () {
         var predictor = new NmrPredictor(db);
         var prediction = predictor.predict(molfile, {group:true});
         prediction.length.should.eql(5);
-        //console.log("Ask Erno prediction ");
-        //console.log(prediction);
     });
 });

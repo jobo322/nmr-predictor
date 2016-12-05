@@ -6,7 +6,10 @@ const OCLE = require('openchemlib-extended');
 
 const Matrix = require('ml-matrix');
 const newArray = require('new-array');
-const defaultOptions = {atomLabel:"H", ignoreLabile: true};
+const request = require('request');
+
+const defaultOptions = {atomLabel:'H', ignoreLabile: true};
+
 class NmrPredictor {
 
     constructor(db) {
@@ -17,38 +20,23 @@ class NmrPredictor {
         this.db = db;
     }
 
-    predict(molfile, param1, param2) {
+    predict(molfile, param1) {
 
         var mol = molfile;
-        if(typeof molfile === "string") {
+        if(typeof molfile === 'string') {
             mol = OCLE.Molecule.fromMolfile(molfile);
             mol.addImplicitHydrogens();
         }
         var prediction;
-        if(typeof this.db === "object") {
-            prediction = this._askErno(mol, param1);
+        if(typeof this.db === 'object') {
+            prediction = group(this._askErno(mol, param1), param1);
         }
-        if(this.db === "spinus") {
+        if(this.db === 'spinus') {
             //The molfile whitout hydrogens
-            prediction = this._fromSpinus(mol, param1, param2);
+            prediction = this._fromSpinus(mol, param1).then(pred => group(pred, param1));
         }
-        if(this.db === "nmrshiftdb2") {
-            prediction = this._fromNnmrshiftdb2(mol, param1);
-        }
-
-        if(param1 && param1.group||param2 && param2.group){
-            prediction.sort(function(a, b) {
-                if(a.diaIDs[0] < b.diaIDs[0]) return -1;
-                if(a.diaIDs[0] > b.diaIDs[0]) return 1;
-                return 0;
-            });
-            for(var i = prediction.length-2; i >= 0; i--){
-                if(prediction[i].diaIDs[0]===prediction[i+1].diaIDs[0]){
-                    prediction[i].integral+=prediction[i+1].integral;
-                    prediction[i].atomIDs=prediction[i].atomIDs.concat(prediction[i+1].atomIDs);
-                    prediction.splice(i+1,1);
-                }
-            }
+        if(this.db === 'nmrshiftdb2') {
+            prediction = group(this._fromNnmrshiftdb2(mol, param1), param1);
         }
 
         return prediction;
@@ -63,18 +51,18 @@ class NmrPredictor {
     _askErno(mol, opt) {
         const options = Object.assign({}, defaultOptions, opt);
         var currentDB = null;
-        const atomLabel = options.atomLabel || "H";
+        const atomLabel = options.atomLabel || 'H';
         if (options.db) {
             currentDB = options.db;
         }
         else {
             if(!this.db)
-                this.db =[[],[],[],[],[],[],[]];
+                this.db =[[], [], [], [], [], [], []];
             currentDB = this.db;
         }
         options.debug = options.debug || false;
         var algorithm = options.algorithm || 0;
-        var levels = options.hoseLevels || [6,5,4,3,2];
+        var levels = options.hoseLevels || [6, 5, 4, 3, 2];
         var couplings = options.getCouplings || false;
         levels.sort(function(a, b) {
             return b - a;
@@ -92,10 +80,10 @@ class NmrPredictor {
         for (j = diaIDs.length-1; j >=0; j--) {
             hosesString = OCLE.Util.getHoseCodesFromDiastereotopicID(diaIDs[j].oclID,  {maxSphereSize:levels[0], type: algorithm});
             atom = {
-                diaIDs: [diaIDs[j].oclID + ""]
+                diaIDs: [diaIDs[j].oclID + '']
             };
             for(k=0; k < levels.length; k++) {
-                atom["hose"+levels[k]] = hosesString[levels[k]-1]+"";
+                atom['hose'+levels[k]] = hosesString[levels[k]-1]+'';
             }
             for (k = diaIDs[j].atoms.length - 1; k >= 0; k--) {
                 atoms[diaIDs[j].atoms[k]] = JSON.parse(JSON.stringify(atom));
@@ -103,16 +91,16 @@ class NmrPredictor {
             }
         }
         //Now, we predict the chimical shift by using our copy of NMRShiftDB
-        //var script2 = "select chemicalShift FROM assignment where ";//hose5='dgH`EBYReZYiIjjjjj@OzP`NET'";
+        //var script2 = 'select chemicalShift FROM assignment where ';//hose5='dgH`EBYReZYiIjjjjj@OzP`NET'';
         var toReturn = new Array(atomNumbers.length);
         for (j = 0; j < atomNumbers.length; j++) {
             atom = atoms[atomNumbers[j]];
-            var res=null;
-            k=0;
+            var res = null;
+            k = 0;
             //A really simple query
-            while(res==null&&k<levels.length){
+            while(res === null && k < levels.length) {
                 if(currentDB[levels[k]]){
-                    res = currentDB[levels[k]][atom["hose"+levels[k]]];
+                    res = currentDB[levels[k]][atom['hose' + levels[k]]];
                 }
                 k++;
             }
@@ -123,7 +111,7 @@ class NmrPredictor {
             atom.level = levels[k-1];
             atom.delta = res.cs;
             atom.integral = 1;
-            atom.atomIDs = ["" + atomNumbers[j]];
+            atom.atomIDs = ['' + atomNumbers[j]];
             atom.ncs = res.ncs;
             atom.std = res.std;
             atom.min = res.min;
@@ -131,14 +119,14 @@ class NmrPredictor {
             atom.j = [];
 
             //Add the predicted couplings
-            //console.log(atomNumbers[j]+" "+infoCOSY[0].atom1);
+            //console.log(atomNumbers[j]+' '+infoCOSY[0].atom1);
             for (i = infoCOSY.length - 1; i >= 0; i--) {
                 if (infoCOSY[i].atom1 - 1 == atomNumbers[j] && infoCOSY[i].coupling > 2) {
                     atom.j.push({
-                        "assignment": infoCOSY[i].atom2 - 1 + "",//Put the diaID instead
-                        "diaID": infoCOSY[i].diaID2,
-                        "coupling": infoCOSY[i].coupling,
-                        "multiplicity": "d"
+                        'assignment': infoCOSY[i].atom2 - 1 + '',//Put the diaID instead
+                        'diaID': infoCOSY[i].diaID2,
+                        'coupling': infoCOSY[i].coupling,
+                        'multiplicity': 'd'
                     });
                 }
             }
@@ -180,72 +168,84 @@ class NmrPredictor {
         return toReturn;
     }
 
-    _fromSpinus(mol, result, options){
-        //Convert to the ranges format and include the diaID for each atomID
-        const data = this._spinusParser(result);
-        const ids = data.ids;
-        const jc = data.couplingConstants;
-        const cs = data.chemicalShifts;
-        const multiplicity = data.multiplicity;
-        const integrals = data.integrals;
+    _fromSpinus(mol, options){
+        let molfile = mol.toMolfile();
+        let that = this;
+        return new Promise((resolve, reject) => {
+            request.post('http://www.nmrdb.org/service/predictor',
+                {form: {molfile: molfile}}, function (error, response, body) {
+                    if(error) {
+                        reject(new Error('http request fail ' + error));
+                    }
+                    else{
+                        //Convert to the ranges format and include the diaID for each atomID
+                        const data = that._spinusParser(body);
+                        const ids = data.ids;
+                        const jc = data.couplingConstants;
+                        const cs = data.chemicalShifts;
+                        const multiplicity = data.multiplicity;
+                        const integrals = data.integrals;
 
-        const nspins = cs.length;
+                        const nspins = cs.length;
 
-        const diaIDs = mol.getGroupedDiastereotopicAtomIDs({atomLabel:"H"});
-        var result = new Array(nspins);
-        var atoms = {};
-        var atomNumbers = [];
-        var i, j, k, oclID, tmpCS;
-        var csByOclID = {};
-        for (j = diaIDs.length-1; j >=0; j--) {
-            oclID = diaIDs[j].oclID + "";
-            for (k = diaIDs[j].atoms.length - 1; k >= 0; k--) {
-                atoms[diaIDs[j].atoms[k]] = oclID;
-                atomNumbers.push(diaIDs[j].atoms[k]);
-                if(!csByOclID[oclID]){
-                    csByOclID[oclID] = {nc:1, cs:cs[ids[diaIDs[j].atoms[k]]]};
-                }
-                else{
-                    csByOclID[oclID].nc++;
-                    csByOclID[oclID].cs+=cs[ids[diaIDs[j].atoms[k]]];
-                }
-            }
-        }
+                        const diaIDs = mol.getGroupedDiastereotopicAtomIDs({atomLabel: 'H'});
+                        var result = new Array(nspins);
+                        var atoms = {};
+                        var atomNumbers = [];
+                        var i, j, k, oclID, tmpCS;
+                        var csByOclID = {};
+                        for (j = diaIDs.length-1; j >=0; j--) {
+                            oclID = diaIDs[j].oclID + '';
+                            for (k = diaIDs[j].atoms.length - 1; k >= 0; k--) {
+                                atoms[diaIDs[j].atoms[k]] = oclID;
+                                atomNumbers.push(diaIDs[j].atoms[k]);
+                                if(!csByOclID[oclID]){
+                                    csByOclID[oclID] = {nc: 1, cs: cs[ids[diaIDs[j].atoms[k]]]};
+                                }
+                                else{
+                                    csByOclID[oclID].nc++;
+                                    csByOclID[oclID].cs += cs[ids[diaIDs[j].atoms[k]]];
+                                }
+                            }
+                        }
 
-        //Average the entries for the equivalent protons
-        var idsKeys = Object.keys(ids);
-        for (i = 0;i < nspins; i++) {
-            tmpCS = csByOclID[atoms[idsKeys[i]]].cs/csByOclID[atoms[idsKeys[i]]].nc;
-            result[i] = {atomIDs:[idsKeys[i]], diaIDs:[atoms[idsKeys[i]]], integral:integrals[i],
-                delta:tmpCS, atomLabel: "H", j:[]};
-            for (j=0; j < nspins; j++) {
-                if(jc[i][j] !== 0 ) {
-                    result[i].j.push({
-                        "assignment": idsKeys[j],
-                        "diaID": atoms[ids[j]],
-                        "coupling": jc[i][j],
-                        "multiplicity": this._multiplicityToString(multiplicity[j])
-                    });
-                }
-            }
-        }
+                        //Average the entries for the equivalent protons
+                        var idsKeys = Object.keys(ids);
+                        for (i = 0;i < nspins; i++) {
+                            tmpCS = csByOclID[atoms[idsKeys[i]]].cs/csByOclID[atoms[idsKeys[i]]].nc;
+                            result[i] = {atomIDs:[idsKeys[i]], diaIDs:[atoms[idsKeys[i]]], integral:integrals[i],
+                                delta:tmpCS, atomLabel: 'H', j:[]};
+                            for (j=0; j < nspins; j++) {
+                                if(jc[i][j] !== 0 ) {
+                                    result[i].j.push({
+                                        'assignment': idsKeys[j],
+                                        'diaID': atoms[ids[j]],
+                                        'coupling': jc[i][j],
+                                        'multiplicity': that._multiplicityToString(multiplicity[j])
+                                    });
+                                }
+                            }
+                        }
 
-        return result;
+                        resolve(result);
+                    }
+                });
+        });
     }
 
     _multiplicityToString(mul){
         switch(mul) {
             case 2:
-                return "d";
+                return 'd';
                 break;
             case 3:
-                return "t";
+                return 't';
                 break;
             case 4:
-                return "q";
+                return 'q';
                 break;
             default:
-                return "";
+                return '';
         }
     }
 
@@ -271,7 +271,7 @@ class NmrPredictor {
             for (j = 0; j < nCoup; j++) {
                 var withID = tokens[4 + 3 * j] - 1;
                 var idx = ids[withID];
-                jc[i][idx] = (+tokens[6 + 3 * j])/2;
+                jc[i][idx] = (+tokens[6 + 3 * j]) / 2;
             }
         }
 
@@ -289,6 +289,24 @@ class NmrPredictor {
     _fromNnmrshiftdb2(molfile, options){
         return null;
     }
+}
+
+function group(prediction, param){
+    if(param && param.group) {
+        prediction.sort(function(a, b) {
+            if(a.diaIDs[0] < b.diaIDs[0]) return -1;
+            if(a.diaIDs[0] > b.diaIDs[0]) return 1;
+            return 0;
+        });
+        for(var i = prediction.length - 2; i >= 0; i--){
+            if(prediction[i].diaIDs[0] === prediction[i + 1].diaIDs[0]){
+                prediction[i].integral += prediction[i + 1].integral;
+                prediction[i].atomIDs = prediction[i].atomIDs.concat(prediction[i + 1].atomIDs);
+                prediction.splice(i + 1, 1);
+            }
+        }
+    }
+    return prediction;
 }
 
 
