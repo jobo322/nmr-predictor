@@ -30,18 +30,6 @@ Copyright by the U.S. Sec. Commerce on behalf of U.S.A. All rights reserved.
 M  END
 `;
 
-const body = `9	1	7.260	4	14	6	3.507	15	7	0.000	10	2	7.718	11	3	7.758
-10	2	7.196	4	9	1	7.718	11	3	1.292	14	6	1.293	15	7	7.718
-11	3	7.162	4	9	1	7.758	10	2	1.292	15	7	3.524	14	6	0.000
-12	5	2.653	3	16	8	7.392	17	8	7.392	18	8	7.392
-13	5	2.653	3	16	8	7.392	17	8	7.392	18	8	7.392
-14	6	7.162	4	9	1	3.507	10	2	1.293	11	3	0.000	15	7	7.758
-15	7	7.260	4	9	1	0.000	10	2	7.718	11	3	3.524	14	6	7.758
-16	8	0.992	2	12	5	7.392	13	5	7.392
-17	8	0.992	2	12	5	7.392	13	5	7.392
-18	8	0.992	2	12	5	7.392	13	5	7.392
-`;
-
 describe('Spinus prediction', function () {
     it('1H chemical shift prediction expanded', function (done) {
             var predictor = new NmrPredictor("spinus");

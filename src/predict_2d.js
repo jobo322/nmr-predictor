@@ -6,7 +6,7 @@ const OCLE = require('openchemlib-extended');
 
 const Matrix = require('ml-matrix');
 const newArray = require('new-array');
-const defaultOptions = {nucleus:"H"};
+const defaultOptions = {nucleus:'H'};
 
 class NmrPredictor2D {
 
@@ -21,19 +21,19 @@ class NmrPredictor2D {
     predict(molfile, param1, param2) {
 
         var mol = molfile;
-        if(typeof molfile === "string") {
+        if(typeof molfile === 'string') {
             mol = OCLE.Molecule.fromMolfile(molfile);
             mol.addImplicitHydrogens();
         }
 
-        if(typeof this.db === "object") {
+        if(typeof this.db === 'object') {
             return this._askErno(mol, param1);
         }
-        if(this.db === "spinus") {
+        if(this.db === 'spinus') {
             //The molfile whitout hydrogens
             return this._fromSpinus(mol, param1, param2);
         }
-        if(this.db === "nmrshiftdb2") {
+        if(this.db === 'nmrshiftdb2') {
             return this._fromNnmrshiftdb2(mol, param1);
         }
     }
@@ -45,9 +45,9 @@ class NmrPredictor2D {
      * @returns    +Object an array of NMRSignal1D
      */
     _askErno(mol, opt) {
-        const options = Object.assign({},defaultOptions, opt);
+        const options = Object.assign({}, defaultOptions, opt);
         var currentDB = null;
-        const nucleus = options.nucleus || "H";
+        const nucleus = options.nucleus || 'H';
         if (options.db) {
             currentDB = options.db;
         }
@@ -76,10 +76,10 @@ class NmrPredictor2D {
         for (j = diaIDs.length-1; j >=0; j--) {
             hosesString = OCLE.Util.getHoseCodesFromDiastereotopicID(diaIDs[j].oclID,  {maxSphereSize:levels[0], type: algorithm});
             atom = {
-                diaIDs: [diaIDs[j].oclID + ""]
+                diaIDs: [diaIDs[j].oclID + '']
             };
             for(k=0; k < levels.length; k++) {
-                atom["hose"+levels[k]] = hosesString[levels[k]-1]+"";
+                atom['hose'+levels[k]] = hosesString[levels[k]-1]+'';
             }
             for (k = diaIDs[j].atoms.length - 1; k >= 0; k--) {
                 atoms[diaIDs[j].atoms[k]] = JSON.parse(JSON.stringify(atom));
@@ -87,7 +87,7 @@ class NmrPredictor2D {
             }
         }
         //Now, we predict the chimical shift by using our copy of NMRShiftDB
-        //var script2 = "select chemicalShift FROM assignment where ";//hose5='dgH`EBYReZYiIjjjjj@OzP`NET'";
+        //var script2 = 'select chemicalShift FROM assignment where ';//hose5='dgH`EBYReZYiIjjjjj@OzP`NET'';
         var toReturn = new Array(atomNumbers.length);
         for (j = 0; j < atomNumbers.length; j++) {
             atom = atoms[atomNumbers[j]];
@@ -96,7 +96,7 @@ class NmrPredictor2D {
             //A really simple query
             while(res==null&&k<levels.length){
                 if(currentDB[levels[k]]){
-                    res = currentDB[levels[k]][atom["hose"+levels[k]]];
+                    res = currentDB[levels[k]][atom['hose'+levels[k]]];
                 }
                 k++;
             }
@@ -106,7 +106,7 @@ class NmrPredictor2D {
             atom.level = levels[k-1];
             atom.delta = res.cs;
             atom.integral = 1;
-            atom.atomIDs = ["" + atomNumbers[j]];
+            atom.atomIDs = ['' + atomNumbers[j]];
             atom.ncs = res.ncs;
             atom.std = res.std;
             atom.min = res.min;
@@ -114,14 +114,14 @@ class NmrPredictor2D {
             atom.j = [];
 
             //Add the predicted couplings
-            //console.log(atomNumbers[j]+" "+infoCOSY[0].atom1);
+            //console.log(atomNumbers[j]+' '+infoCOSY[0].atom1);
             for (i = infoCOSY.length - 1; i >= 0; i--) {
                 if (infoCOSY[i].atom1 - 1 == atomNumbers[j] && infoCOSY[i].coupling > 2) {
                     atom.j.push({
-                        "assignment": infoCOSY[i].atom2 - 1 + "",//Put the diaID instead
-                        "diaID": infoCOSY[i].diaID2,
-                        "coupling": infoCOSY[i].coupling,
-                        "multiplicity": "d"
+                        'assignment': infoCOSY[i].atom2 - 1 + '',//Put the diaID instead
+                        'diaID': infoCOSY[i].diaID2,
+                        'coupling': infoCOSY[i].coupling,
+                        'multiplicity': 'd'
                     });
                 }
             }
@@ -129,8 +129,8 @@ class NmrPredictor2D {
         }
         //TODO this will not work because getPaths is not implemented yet!!!!
         if(options.ignoreLabile) {
-            var linksOH = mol.getPaths(1,1,"H","O",false);
-            var linksNH = mol.getPaths(1,1,"H","N",false);
+            var linksOH = mol.getPaths(1,1,'H','O',false);
+            var linksNH = mol.getPaths(1,1,'H','N',false);
             for(j = toReturn.length-1; j >= 0; j--) {
                 for(var k = 0; k < linksOH.length; k++) {
                     if(toReturn[j].diaIDs[0] == linksOH[k].diaID1) {
@@ -164,14 +164,14 @@ class NmrPredictor2D {
 
         const nspins = cs.length;
 
-        const diaIDs = mol.getGroupedDiastereotopicAtomIDs({atomLabel:"H"});
+        const diaIDs = mol.getGroupedDiastereotopicAtomIDs({atomLabel:'H'});
         var result = new Array(nspins);
         var atoms = {};
         var atomNumbers = [];
         var i, j, k, oclID, tmpCS;
         var csByOclID = {};
         for (j = diaIDs.length-1; j >=0; j--) {
-            oclID = diaIDs[j].oclID + "";
+            oclID = diaIDs[j].oclID + '';
             for (k = diaIDs[j].atoms.length - 1; k >= 0; k--) {
                 atoms[diaIDs[j].atoms[k]] = oclID;
                 atomNumbers.push(diaIDs[j].atoms[k]);
@@ -194,10 +194,10 @@ class NmrPredictor2D {
             for (j=0; j < nspins; j++) {
                 if(jc[i][j] !== 0 ) {
                     result[i].j.push({
-                        "assignment": idsKeys[j],
-                        "diaID": atoms[ids[j]],
-                        "coupling": jc[i][j],
-                        "multiplicity": multiplicity[j]
+                        'assignment': idsKeys[j],
+                        'diaID': atoms[ids[j]],
+                        'coupling': jc[i][j],
+                        'multiplicity': multiplicity[j]
                     });
                 }
             }
