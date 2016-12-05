@@ -3,7 +3,6 @@
  * Created by acastillo on 7/5/16.
  */
 const OCLE = require('openchemlib-extended');
-
 const Matrix = require('ml-matrix');
 const newArray = require('new-array');
 const request = require('request');
@@ -16,7 +15,7 @@ class NmrPredictor {
         this.db = db;
     }
 
-    setDB(db){
+    setDB(db) {
         this.db = db;
     }
 
@@ -68,7 +67,7 @@ class NmrPredictor {
             return b - a;
         });
 
-        var diaIDs = mol.getGroupedDiastereotopicAtomIDs({atomLabel:atomLabel});
+        var diaIDs = mol.getGroupedDiastereotopicAtomIDs({atomLabel: atomLabel});
         var infoCOSY = [];//mol.getCouplings();
         if(couplings) {
             //    infoCOSY = mol.predictCouplings();
@@ -77,12 +76,12 @@ class NmrPredictor {
         var atoms = {};
         var atomNumbers = [];
         var i, k, j, atom, hosesString;
-        for (j = diaIDs.length-1; j >=0; j--) {
-            hosesString = OCLE.Util.getHoseCodesFromDiastereotopicID(diaIDs[j].oclID,  {maxSphereSize:levels[0], type: algorithm});
+        for (j = diaIDs.length - 1; j >= 0; j--) {
+            hosesString = OCLE.Util.getHoseCodesFromDiastereotopicID(diaIDs[j].oclID,  {maxSphereSize: levels[0], type: algorithm});
             atom = {
                 diaIDs: [diaIDs[j].oclID + '']
             };
-            for(k=0; k < levels.length; k++) {
+            for(k = 0; k < levels.length; k++) {
                 atom['hose'+levels[k]] = hosesString[levels[k]-1]+'';
             }
             for (k = diaIDs[j].atoms.length - 1; k >= 0; k--) {
@@ -130,7 +129,7 @@ class NmrPredictor {
                     });
                 }
             }
-            toReturn[j]=atom;
+            toReturn[j] = atom;
         }
         //TODO this will not work because getPaths is not implemented yet!!!!
         if(options.ignoreLabile) {
@@ -149,7 +148,7 @@ class NmrPredictor {
             for(j = toReturn.length-1; j >= 0; j--) {
                 for(var k = 0; k < linksOH.length; k++) {
                     if(toReturn[j].diaIDs[0] == linksOH[k].fromDiaID) {
-                        toReturn.splice(j,1);
+                        toReturn.splice(j, 1);
                         break;
                     }
                 }
@@ -158,7 +157,7 @@ class NmrPredictor {
             for(j = toReturn.length-1; j >= 0; j--) {
                 for(var k = 0;k < linksNH.length; k++) {
                     if(toReturn[j].diaIDs[0] == linksNH[k].fromDiaID) {
-                        toReturn.splice(j,1);
+                        toReturn.splice(j, 1);
                         break;
                     }
                 }
@@ -194,7 +193,7 @@ class NmrPredictor {
                         var atomNumbers = [];
                         var i, j, k, oclID, tmpCS;
                         var csByOclID = {};
-                        for (j = diaIDs.length-1; j >=0; j--) {
+                        for (j = diaIDs.length-1; j >= 0; j--) {
                             oclID = diaIDs[j].oclID + '';
                             for (k = diaIDs[j].atoms.length - 1; k >= 0; k--) {
                                 atoms[diaIDs[j].atoms[k]] = oclID;
@@ -211,10 +210,10 @@ class NmrPredictor {
 
                         //Average the entries for the equivalent protons
                         var idsKeys = Object.keys(ids);
-                        for (i = 0;i < nspins; i++) {
+                        for (i = 0; i < nspins; i++) {
                             tmpCS = csByOclID[atoms[idsKeys[i]]].cs/csByOclID[atoms[idsKeys[i]]].nc;
-                            result[i] = {atomIDs:[idsKeys[i]], diaIDs:[atoms[idsKeys[i]]], integral:integrals[i],
-                                delta:tmpCS, atomLabel: 'H', j:[]};
+                            result[i] = {atomIDs: [idsKeys[i]], diaIDs: [atoms[idsKeys[i]]], integral: integrals[i],
+                                delta: tmpCS, atomLabel: 'H', j: []};
                             for (j=0; j < nspins; j++) {
                                 if(jc[i][j] !== 0 ) {
                                     result[i].j.push({
@@ -233,7 +232,7 @@ class NmrPredictor {
         });
     }
 
-    _multiplicityToString(mul){
+    _multiplicityToString(mul) {
         switch(mul) {
             case 2:
                 return 'd';
@@ -281,7 +280,7 @@ class NmrPredictor {
             }
         }
 
-        return {ids, chemicalShifts:cs, integrals, couplingConstants:jc, multiplicity: newArray(nspins, 2)};
+        return {ids, chemicalShifts: cs, integrals, couplingConstants: jc, multiplicity: newArray(nspins, 2)};
 
     }
 
@@ -291,7 +290,7 @@ class NmrPredictor {
     }
 }
 
-function group(prediction, param){
+function group(prediction, param) {
     if(param && param.group) {
         prediction.sort(function(a, b) {
             if(a.diaIDs[0] < b.diaIDs[0]) return -1;
