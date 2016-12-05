@@ -76,7 +76,7 @@ describe('Ask Erno prediction indometacin', function () {
 
     it('1H chemical shift prediction with labile', function () {
         var predictor = new NmrPredictor(db);
-        var prediction = predictor.predict(molfile, {ignoreLabile:false});
+        var prediction = predictor.predict(molfile, {ignoreLabile: false});
         prediction.length.should.eql(16);
     });
 });
