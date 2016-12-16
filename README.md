@@ -50,12 +50,6 @@ var predictor = new NmrPredictor("spinus");
 predictor.predict(molfile).then(prediction => {
             console.log(prediction);
 });
-            
-var predictor = new NmrPredictor("spinus");
-predictor.predict(molfile, {group:true}).then(prediction => {
-            console.log(prediction);
-          });
-```
 
 ## License
 
