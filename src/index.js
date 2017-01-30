@@ -98,7 +98,7 @@ class NmrPredictor {
             k = 0;
             //A really simple query
             while(res === null && k < levels.length) {
-                if(currentDB[levels[k]]){
+                if(currentDB[levels[k]]) {
                     res = currentDB[levels[k]][atom['hose' + levels[k]]];
                 }
                 k++;
@@ -147,7 +147,7 @@ class NmrPredictor {
             });
             for(j = toReturn.length-1; j >= 0; j--) {
                 for(var k = 0; k < linksOH.length; k++) {
-                    if(toReturn[j].diaIDs[0] == linksOH[k].fromDiaID) {
+                    if(toReturn[j].diaIDs[0] === linksOH[k].fromDiaID) {
                         toReturn.splice(j, 1);
                         break;
                     }
@@ -156,7 +156,7 @@ class NmrPredictor {
             //console.log(h1pred.length);
             for(j = toReturn.length-1; j >= 0; j--) {
                 for(var k = 0;k < linksNH.length; k++) {
-                    if(toReturn[j].diaIDs[0] == linksNH[k].fromDiaID) {
+                    if(toReturn[j].diaIDs[0] === linksNH[k].fromDiaID) {
                         toReturn.splice(j, 1);
                         break;
                     }
@@ -193,15 +193,14 @@ class NmrPredictor {
                         var atomNumbers = [];
                         var i, j, k, oclID, tmpCS;
                         var csByOclID = {};
-                        for (j = diaIDs.length-1; j >= 0; j--) {
+                        for (j = diaIDs.length - 1; j >= 0; j--) {
                             oclID = diaIDs[j].oclID + '';
                             for (k = diaIDs[j].atoms.length - 1; k >= 0; k--) {
                                 atoms[diaIDs[j].atoms[k]] = oclID;
                                 atomNumbers.push(diaIDs[j].atoms[k]);
                                 if(!csByOclID[oclID]){
                                     csByOclID[oclID] = {nc: 1, cs: cs[ids[diaIDs[j].atoms[k]]]};
-                                }
-                                else{
+                                } else {
                                     csByOclID[oclID].nc++;
                                     csByOclID[oclID].cs += cs[ids[diaIDs[j].atoms[k]]];
                                 }
@@ -211,14 +210,14 @@ class NmrPredictor {
                         //Average the entries for the equivalent protons
                         var idsKeys = Object.keys(ids);
                         for (i = 0; i < nspins; i++) {
-                            tmpCS = csByOclID[atoms[idsKeys[i]]].cs/csByOclID[atoms[idsKeys[i]]].nc;
+                            tmpCS = csByOclID[atoms[idsKeys[i]]].cs / csByOclID[atoms[idsKeys[i]]].nc;
                             result[i] = {atomIDs: [idsKeys[i]], diaIDs: [atoms[idsKeys[i]]], integral: integrals[i],
                                 delta: tmpCS, atomLabel: 'H', j: []};
-                            for (j=0; j < nspins; j++) {
+                            for (j = 0; j < nspins; j++) {
                                 if(jc[i][j] !== 0 ) {
                                     result[i].j.push({
                                         'assignment': idsKeys[j],
-                                        'diaID': atoms[ids[j]],
+                                        'diaID': atoms[idsKeys[j]],
                                         'coupling': jc[i][j],
                                         'multiplicity': that._multiplicityToString(multiplicity[j])
                                     });
