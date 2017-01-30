@@ -3,7 +3,7 @@
  * Created by acastillo on 7/5/16.
  */
 const OCLE = require('openchemlib-extended');
-const NmrPredictor = require('./index.js');
+const lib = require('./index.js');
 
 class NmrPredictor2D {
 
@@ -22,7 +22,7 @@ class NmrPredictor2D {
             mol.addImplicitHydrogens();
         }
         let paths = mol.getAllPaths(options);
-        let predictor = new NmrPredictor(options.predictor || "spinus");
+        let predictor = new lib.NmrPredictor1D(options.predictor || "spinus");
 
         return predictor.predict(mol, {group:true}).then(predictions => {
             let idMap = {};

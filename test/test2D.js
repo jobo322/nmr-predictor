@@ -1,7 +1,7 @@
 'use strict';
 
 //const NmrPredictor = require('..');
-const NmrPredictor2D = require('../src/predict_2d.js');
+const lib = require('..');
 //const request = require('request');
 //const fs = require('fs');
 
@@ -33,7 +33,7 @@ M  END
 
 describe('2D prediction', function () {
     it('COSY', function (done) {
-            var predictor = new NmrPredictor2D({});
+            var predictor = new lib.NmrPredictor2D({});
             predictor.predict(molfile, {fromLabel: "H", toLabel: "H", minLength: 1, maxLength: 3}).then(prediction => {
                 let count = 0;
                 prediction.forEach(element => {

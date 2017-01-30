@@ -1,6 +1,6 @@
 'use strict';
 
-const NmrPredictor = require('..');
+const lib = require('..');
 const request = require('request');
 const fs = require('fs');
 
@@ -69,13 +69,13 @@ M  END
 
 describe('Ask Erno prediction indometacin', function () {
     it('1H chemical shift prediction no labile', function () {
-        var predictor = new NmrPredictor(db);
+        var predictor = new lib.NmrPredictor1D(db);
         var prediction = predictor.predict(molfile);
         prediction.length.should.eql(15);
     });
 
     it('1H chemical shift prediction with labile', function () {
-        var predictor = new NmrPredictor(db);
+        var predictor = new lib.NmrPredictor1D(db);
         var prediction = predictor.predict(molfile, {ignoreLabile: false});
         prediction.length.should.eql(16);
     });

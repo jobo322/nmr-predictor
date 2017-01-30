@@ -1,6 +1,6 @@
 'use strict';
 
-const NmrPredictor = require('..');
+const lib = require('..');
 const request = require('request');
 const fs = require('fs');
 
@@ -32,14 +32,14 @@ M  END
 
 describe('Spinus prediction', function () {
     it('1H chemical shift prediction expanded', function (done) {
-            var predictor = new NmrPredictor("spinus");
+            var predictor = new lib.NmrPredictor1D("spinus");
             predictor.predict(molfile).then(prediction => {
                 prediction.length.should.eql(10);
                 done();
             });
     });
     it('1H chemical shift prediction grouped', function (done) {
-        var predictor = new NmrPredictor("spinus");
+        var predictor = new lib.NmrPredictor1D("spinus");
         predictor.predict(molfile, {group:true}).then(prediction => {
             prediction.length.should.eql(5);
             done()
@@ -50,13 +50,13 @@ describe('Spinus prediction', function () {
 
 describe('Ask Erno prediction', function () {
     it('1H chemical shift prediction expanded', function () {
-        var predictor = new NmrPredictor(db);
+        var predictor = new lib.NmrPredictor1D(db);
         var prediction = predictor.predict(molfile);
         prediction.length.should.eql(10);
     });
 
     it('1H chemical shift prediction grouped', function () {
-        var predictor = new NmrPredictor(db);
+        var predictor = new lib.NmrPredictor1D(db);
         var prediction = predictor.predict(molfile, {group:true});
         prediction.length.should.eql(5);
     });
