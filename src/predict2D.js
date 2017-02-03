@@ -7,12 +7,12 @@ const lib = require('./index.js');
 
 class NmrPredictor2D {
 
-    constructor(db) {
-        this.db = db;
+    constructor(dbs) {
+        this.dbs = dbs;
     }
 
-    setDB(db){
-        this.db = db;
+    setDB(dbs){
+        this.dbs = dbs;
     }
 
     predict(molfile, options) {
@@ -22,9 +22,10 @@ class NmrPredictor2D {
             mol.addImplicitHydrogens();
         }
         let paths = mol.getAllPaths(options);
-        let predictor = new lib.NmrPredictor1D(options.predictor || "spinus");
+        let predictor0 = new lib.NmrPredictor1D(this.dbs[0] || "spinus");
+        let predictor1 = new lib.NmrPredictor1D(this.dbs[1] || "spinus");
 
-        return predictor.predict(mol, {group:true}).then(predictions => {
+        return predictor0.predict(mol, {group:true}).then(predictions => {
             let idMap = {};
             predictions.forEach(prediction => {
                 idMap[prediction["diaIDs"][0]] = prediction;

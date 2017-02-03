@@ -5,9 +5,10 @@
 const OCLE = require('openchemlib-extended');
 const Matrix = require('ml-matrix');
 const newArray = require('new-array');
-const request = require('request');
+const whatwg = require('node-fetch');
+const FormData = require('form-data');
 
-const defaultOptions = {atomLabel:'H', ignoreLabile: true};
+const defaultOptions = {atomLabel:'H', ignoreLabile: true, use: 'median'};
 
 class NmrPredictor {
 
@@ -28,29 +29,26 @@ class NmrPredictor {
         }
         var prediction;
         if(typeof this.db === 'object') {
-            prediction = group(this._askErno(mol, param1), param1);
+            prediction = group(this._queryByHose(mol, param1), param1);
         }
         if(this.db === 'spinus') {
             //The molfile whitout hydrogens
             prediction = this._fromSpinus(mol, param1).then(pred => group(pred, param1));
-        }
-        if(this.db === 'nmrshiftdb2') {
-            prediction = group(this._fromNnmrshiftdb2(mol, param1), param1);
         }
 
         return prediction;
     }
 
     /**
-     * @function nmrShiftDBPred1H(molfile)
      * This function predict shift for 1H-NMR, from a molfile by using the cheminfo reference data base.
-     * @param    molfile:string    A molfile content
+     * @param    molfile: string    A molfile content
      * @returns    +Object an array of NMRSignal1D
      */
-    _askErno(mol, opt) {
+    _queryByHose(mol, opt) {
         const options = Object.assign({}, defaultOptions, opt);
         var currentDB = null;
         const atomLabel = options.atomLabel || 'H';
+        const use  = options.use;
         if (options.db) {
             currentDB = options.db;
         }
@@ -109,6 +107,10 @@ class NmrPredictor {
             atom.atomLabel = atomLabel;
             atom.level = levels[k-1];
             atom.delta = res.cs;
+            if(use === 'median' && res.median)
+                atom.delta = res.median;
+            else if (use === 'mean' && res.mean)
+                atom.delta = res.mean;
             atom.integral = 1;
             atom.atomIDs = ['' + atomNumbers[j]];
             atom.ncs = res.ncs;
@@ -170,7 +172,68 @@ class NmrPredictor {
     _fromSpinus(mol, options){
         let molfile = mol.toMolfile();
         let that = this;
-        return new Promise((resolve, reject) => {
+
+        let form = new FormData();
+        form.append('molfile', molfile);
+
+        return whatwg('http://www.nmrdb.org/service/predictor', {
+            method: 'POST',
+            body: form
+
+        }).then(value => {return value.text()}).then(body => {
+            //Convert to the ranges format and include the diaID for each atomID
+            const data = that._spinusParser(body);
+            const ids = data.ids;
+            const jc = data.couplingConstants;
+            const cs = data.chemicalShifts;
+            const multiplicity = data.multiplicity;
+            const integrals = data.integrals;
+
+            const nspins = cs.length;
+
+            const diaIDs = mol.getGroupedDiastereotopicAtomIDs({atomLabel: 'H'});
+            var result = new Array(nspins);
+            var atoms = {};
+            var atomNumbers = [];
+            var i, j, k, oclID, tmpCS;
+            var csByOclID = {};
+            for (j = diaIDs.length - 1; j >= 0; j--) {
+                oclID = diaIDs[j].oclID + '';
+                for (k = diaIDs[j].atoms.length - 1; k >= 0; k--) {
+                    atoms[diaIDs[j].atoms[k]] = oclID;
+                    atomNumbers.push(diaIDs[j].atoms[k]);
+                    if(!csByOclID[oclID]){
+                        csByOclID[oclID] = {nc: 1, cs: cs[ids[diaIDs[j].atoms[k]]]};
+                    } else {
+                        csByOclID[oclID].nc++;
+                        csByOclID[oclID].cs += cs[ids[diaIDs[j].atoms[k]]];
+                    }
+                }
+            }
+
+            //Average the entries for the equivalent protons
+            var idsKeys = Object.keys(ids);
+            for (i = 0; i < nspins; i++) {
+                tmpCS = csByOclID[atoms[idsKeys[i]]].cs / csByOclID[atoms[idsKeys[i]]].nc;
+                result[i] = {atomIDs: [idsKeys[i]], diaIDs: [atoms[idsKeys[i]]], integral: integrals[i],
+                    delta: tmpCS, atomLabel: 'H', j: []};
+                for (j = 0; j < nspins; j++) {
+                    if(jc[i][j] !== 0 ) {
+                        result[i].j.push({
+                            'assignment': idsKeys[j],
+                            'diaID': atoms[idsKeys[j]],
+                            'coupling': jc[i][j],
+                            'multiplicity': that._multiplicityToString(multiplicity[j])
+                        });
+                    }
+                }
+            }
+
+            return result;
+        }).catch(ex => {return new Error('http request fail ' + ex)});
+
+
+        /*return new Promise((resolve, reject) => {
             request.post('http://www.nmrdb.org/service/predictor',
                 {form: {molfile: molfile}}, function (error, response, body) {
                     if(error) {
@@ -228,7 +291,7 @@ class NmrPredictor {
                         resolve(result);
                     }
                 });
-        });
+        });*/
     }
 
     _multiplicityToString(mul) {
@@ -281,11 +344,6 @@ class NmrPredictor {
 
         return {ids, chemicalShifts: cs, integrals, couplingConstants: jc, multiplicity: newArray(nspins, 2)};
 
-    }
-
-    //TODO implement the 13C chemical shift prediction
-    _fromNnmrshiftdb2(molfile, options){
-        return null;
     }
 }
 

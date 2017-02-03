@@ -28,6 +28,7 @@
     "openchemlib-extended": "1.9.1",
     "ml-matrix": "^1.1.2",
     "new-array": "^1.0.0",
-    "request": "2.72.0"
+    "node-fetch": "1.6.3",
+    "form-data": "2.1.2"
   }
 }

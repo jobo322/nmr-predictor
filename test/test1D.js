@@ -4,7 +4,8 @@ const lib = require('..');
 const request = require('request');
 const fs = require('fs');
 
-const db = JSON.parse(fs.readFileSync(__dirname + "/h1_database.json").toString());
+const db1H = JSON.parse(fs.readFileSync(__dirname + "/h1_database.json").toString());
+const db13C = JSON.parse(fs.readFileSync(__dirname + "/nmrshiftdb2.json").toString());
 
 
 const molfile = `Benzene, ethyl-, ID: C100414
@@ -48,16 +49,28 @@ describe('Spinus prediction', function () {
 });
 
 
-describe('Ask Erno prediction', function () {
+describe('HOSE assignment prediction', function () {
     it('1H chemical shift prediction expanded', function () {
-        var predictor = new lib.NmrPredictor1D(db);
+        var predictor = new lib.NmrPredictor1D(db1H);
         var prediction = predictor.predict(molfile);
         prediction.length.should.eql(10);
     });
 
     it('1H chemical shift prediction grouped', function () {
-        var predictor = new lib.NmrPredictor1D(db);
+        var predictor = new lib.NmrPredictor1D(db1H);
         var prediction = predictor.predict(molfile, {group:true});
         prediction.length.should.eql(5);
+    });
+
+    it('13C chemical shift prediction expanded', function () {
+        var predictor = new lib.NmrPredictor1D(db13C);
+        var prediction = predictor.predict(molfile, {atomLabel: 'C'});
+        prediction.length.should.eql(8);
+    });
+
+    it('13C chemical shift prediction grouped', function () {
+        var predictor = new lib.NmrPredictor1D(db13C);
+        var prediction = predictor.predict(molfile, {group:true, atomLabel: 'C'});
+        prediction.length.should.eql(6);
     });
 });
