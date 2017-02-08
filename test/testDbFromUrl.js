@@ -3,6 +3,13 @@
 const lib = require('..');
 const request = require('request');
 const fs = require('fs');
+const fetch = require('node-fetch');
+
+return fetch('https://www.nmrdb.org/service/predictor', {
+    method: 'POST',
+    body: form
+
+}).then(value => {return value.text()}).then(body => {
 
 const db1H = JSON.parse(fs.readFileSync(__dirname + "/../data/h1.json").toString());
 const db13C = JSON.parse(fs.readFileSync(__dirname + "/../data/nmrshiftdb2.json").toString());
@@ -34,11 +41,11 @@ M  END
 
 describe('Spinus prediction', function () {
     it('1H chemical shift prediction expanded', function (done) {
-            var predictor = new lib.NmrPredictor1D("spinus");
-            predictor.spinus(molfile).then(prediction => {
-                prediction.length.should.eql(10);
-                done();
-            });
+        var predictor = new lib.NmrPredictor1D("spinus");
+        predictor.spinus(molfile).then(prediction => {
+            prediction.length.should.eql(10);
+            done();
+        });
     });
     it('1H chemical shift prediction grouped', function (done) {
         var predictor = new lib.NmrPredictor1D("spinus");

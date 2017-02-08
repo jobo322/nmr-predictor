@@ -5,7 +5,7 @@ const lib = require('..');
 //const request = require('request');
 //const fs = require('fs');
 
-//const db = JSON.parse(fs.readFileSync(__dirname + "/h1_database.json").toString());
+//const db = JSON.parse(fs.readFileSync(__dirname + "/h1.json").toString());
 
 
 const molfile = `Benzene, ethyl-, ID: C100414
@@ -67,11 +67,11 @@ describe('2D prediction', function () {
                 done();
             });
     });
-    /*it('HSQC', function (done) {
+    it('HSQC', function (done) {
         var predictor = new NmrPredictor("spinus");
         predictor.predict(molfile, {group:true}).then(prediction => {
             prediction.length.should.eql(5);
             done();
         });
-    });*/
+    });
 });
