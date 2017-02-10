@@ -41,11 +41,11 @@ describe('URL JSON 1H prediction', function () {
 });
 
 describe('URL JSON 13C prediction', function () {
-    this.timeout(10000);
+    this.timeout(20000);
     it('13C chemical shift prediction expanded', function (done) {
         fetch('https://raw.githubusercontent.com/cheminfo-js/nmr-predictor/master/data/nmrshiftdb2.json', {
             method: 'GET',
-            timeout: 10000
+            timeout: 20000
         }).then(value => {return value.text()}).then(body => {
             const db13C = JSON.parse(body);
             var predictor = new NmrPredictor({"C": db13C});

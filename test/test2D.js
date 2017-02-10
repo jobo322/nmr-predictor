@@ -31,44 +31,51 @@ M  END
 `;
 
 describe('2D prediction', function () {
+    this.timeout(1000);
     it('COSY', function (done) {
+        var predictor = new NmrPredictor({'H': db1H,'C': db13C});
+        var h1 = predictor.proton(molfile);
+        predictor.towD(h1, h1, molfile, {minLength: 1, maxLength: 3}).then(prediction => {
+            let count = 0;
+            prediction.forEach(element => {
+                if(element.fromDiaID === "did@`@f\\bbRaih@J@A~dHBIU@"
+                    && element.toDiaID === "did@`@fTfUvf`@h@GzP`HeT" && element.pathLength === 3)
+                    count++;
+                if(element.toDiaID === "did@`@f\\bbRaih@J@A~dHBIU@"
+                    && element.fromDiaID === "did@`@fTfUvf`@h@GzP`HeT" && element.pathLength === 3)
+                    count++;
+                if(element.fromDiaID === "did@`@f\\bbRaih@J@A~dHBIU@"
+                    && element.toDiaID === "did@`@fTfYUn`HH@GzP`HeT" && element.pathLength === 3)
+                    count++;
+                if(element.toDiaID === "did@`@f\\bbRaih@J@A~dHBIU@"
+                    && element.fromDiaID === "did@`@fTfYUn`HH@GzP`HeT" && element.pathLength === 3)
+                    count++;
+                if(element.fromDiaID === "did@`@fTf[Waj@@bJ@_iB@bUP"
+                    && element.toDiaID === "did@`@fTeYWaj@@@GzP`HeT" && element.pathLength === 3)
+                    count++;
+                if(element.toDiaID === "did@`@fTf[Waj@@bJ@_iB@bUP"
+                    && element.fromDiaID === "did@`@fTeYWaj@@@GzP`HeT" && element.pathLength === 3)
+                    count++;
+
+                if(element.toDiaID === "did@`@fTf[Waj@@bJ@_iB@bUP"
+                    && element.fromDiaID === "did@`@fTf[Waj@@bJ@_iB@bUP" && element.pathLength === 2)
+                    count++;
+                if(element.toDiaID === "did@`@fTeYWaj@@@GzP`HeT"
+                    && element.fromDiaID === "did@`@fTeYWaj@@@GzP`HeT" && element.pathLength === 2)
+                    count++;
+            });
+
+            prediction.length.should.eql(count);
+            done();
+        });
+    });
+    it('HSQC', function (done) {
         var predictor = new NmrPredictor({'H': db1H,'C': db13C});
         var c13 = predictor.carbon(molfile);
         var h1 = predictor.proton(molfile);
-            predictor.towD(h1, c13, molfile, {minLength: 1, maxLength: 3}).then(prediction => {
-                let count = 0;
-                prediction.forEach(element => {
-                    if(element.fromDiaID === "did@`@f\\bbRaih@J@A~dHBIU@"
-                        && element.toDiaID === "did@`@fTfUvf`@h@GzP`HeT" && element.pathLength === 3)
-                        count++;
-                    if(element.toDiaID === "did@`@f\\bbRaih@J@A~dHBIU@"
-                        && element.fromDiaID === "did@`@fTfUvf`@h@GzP`HeT" && element.pathLength === 3)
-                        count++;
-                    if(element.fromDiaID === "did@`@f\\bbRaih@J@A~dHBIU@"
-                        && element.toDiaID === "did@`@fTfYUn`HH@GzP`HeT" && element.pathLength === 3)
-                        count++;
-                    if(element.toDiaID === "did@`@f\\bbRaih@J@A~dHBIU@"
-                        && element.fromDiaID === "did@`@fTfYUn`HH@GzP`HeT" && element.pathLength === 3)
-                        count++;
-                    if(element.fromDiaID === "did@`@fTf[Waj@@bJ@_iB@bUP"
-                        && element.toDiaID === "did@`@fTeYWaj@@@GzP`HeT" && element.pathLength === 3)
-                        count++;
-                    if(element.toDiaID === "did@`@fTf[Waj@@bJ@_iB@bUP"
-                        && element.fromDiaID === "did@`@fTeYWaj@@@GzP`HeT" && element.pathLength === 3)
-                        count++;
-
-                    if(element.toDiaID === "did@`@fTf[Waj@@bJ@_iB@bUP"
-                        && element.fromDiaID === "did@`@fTf[Waj@@bJ@_iB@bUP" && element.pathLength === 2)
-                        count++;
-                    if(element.toDiaID === "did@`@fTeYWaj@@@GzP`HeT"
-                        && element.fromDiaID === "did@`@fTeYWaj@@@GzP`HeT" && element.pathLength === 2)
-                        count++;
-                });
-                prediction.length.should.eql(count);
-                done();
-            });
-    });
-    it('HSQC', function (done) {
-        done();
+        predictor.towD(h1, c13, molfile, {minLength: 1, maxLength: 4}).then(prediction => {
+            prediction.length.should.eql(24);
+            done();
+        });
     });
 });

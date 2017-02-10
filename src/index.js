@@ -88,6 +88,7 @@ class NmrPredictor {
             idMap2[prediction["diaIDs"][0]] = prediction;
         });
 
+
         paths.forEach(element => {
             element.fromChemicalShift = idMap1[element.fromDiaID].delta;
             element.toChemicalShift = idMap2[element.toDiaID].delta;
@@ -97,7 +98,9 @@ class NmrPredictor {
             element.j = getCouplingConstant(idMap1, element.fromDiaID, element.toDiaID);
         });
 
-        return paths;
+        return new Promise(function(resolve, reject){
+            resolve(paths);
+        });
     }
 }
 
