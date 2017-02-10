@@ -1,12 +1,11 @@
 'use strict';
 
-//const NmrPredictor = require('..');
-const lib = require('..');
-//const request = require('request');
-//const fs = require('fs');
+const NmrPredictor = require('..');
+const fs = require('fs');
 
-//const db = JSON.parse(fs.readFileSync(__dirname + "/h1.json").toString());
 
+const db1H = JSON.parse(fs.readFileSync(__dirname + '/../data/h1.json').toString());
+const db13C = JSON.parse(fs.readFileSync(__dirname + '/../data/nmrshiftdb2.json').toString());
 
 const molfile = `Benzene, ethyl-, ID: C100414
   NIST    16081116462D 1   1.00000     0.00000
@@ -33,8 +32,10 @@ M  END
 
 describe('2D prediction', function () {
     it('COSY', function (done) {
-            var predictor = new lib.NmrPredictor2D({});
-            predictor.predict(molfile, {fromLabel: "H", toLabel: "H", minLength: 1, maxLength: 3}).then(prediction => {
+        var predictor = new NmrPredictor({'H': db1H,'C': db13C});
+        var c13 = predictor.carbon(molfile);
+        var h1 = predictor.proton(molfile);
+            predictor.towD(h1, c13, molfile, {minLength: 1, maxLength: 3}).then(prediction => {
                 let count = 0;
                 prediction.forEach(element => {
                     if(element.fromDiaID === "did@`@f\\bbRaih@J@A~dHBIU@"
@@ -68,10 +69,6 @@ describe('2D prediction', function () {
             });
     });
     it('HSQC', function (done) {
-        var predictor = new NmrPredictor("spinus");
-        predictor.predict(molfile, {group:true}).then(prediction => {
-            prediction.length.should.eql(5);
-            done();
-        });
+        done();
     });
 });

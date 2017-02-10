@@ -1,20 +1,7 @@
 'use strict';
 
-const lib = require('..');
-const request = require('request');
-const fs = require('fs');
+const NmrPredictor = require('..');
 const fetch = require('node-fetch');
-
-return fetch('https://www.nmrdb.org/service/predictor', {
-    method: 'POST',
-    body: form
-
-}).then(value => {return value.text()}).then(body => {
-
-const db1H = JSON.parse(fs.readFileSync(__dirname + "/../data/h1.json").toString());
-const db13C = JSON.parse(fs.readFileSync(__dirname + "/../data/nmrshiftdb2.json").toString());
-
-
 
 const molfile = `Benzene, ethyl-, ID: C100414
   NIST    16081116462D 1   1.00000     0.00000
@@ -39,46 +26,32 @@ Copyright by the U.S. Sec. Commerce on behalf of U.S.A. All rights reserved.
 M  END
 `;
 
-describe('Spinus prediction', function () {
+describe('URL JSON 1H prediction', function () {
     it('1H chemical shift prediction expanded', function (done) {
-        var predictor = new lib.NmrPredictor1D("spinus");
-        predictor.spinus(molfile).then(prediction => {
-            prediction.length.should.eql(10);
-            done();
-        });
-    });
-    it('1H chemical shift prediction grouped', function (done) {
-        var predictor = new lib.NmrPredictor1D("spinus");
-        predictor.spinus(molfile, {group:true}).then(prediction => {
+        fetch('https://raw.githubusercontent.com/cheminfo-js/nmr-predictor/master/data/h1.json', {
+            method: 'GET'
+        }).then(value => {return value.text()}).then(body => {
+            const db1H = JSON.parse(body);
+            var predictor = new NmrPredictor({"H": db1H});
+            var prediction = predictor.proton(molfile, {group:true});
             prediction.length.should.eql(5);
-            done()
+            done();
         });
     });
 });
 
-
-describe('HOSE assignment prediction', function () {
-    it('1H chemical shift prediction expanded', function () {
-        var predictor = new lib.NmrPredictor1D({"H": db1H});
-        var prediction = predictor.proton(molfile);
-        prediction.length.should.eql(10);
-    });
-
-    it('1H chemical shift prediction grouped', function () {
-        var predictor = new lib.NmrPredictor1D({"H": db1H});
-        var prediction = predictor.proton(molfile, {group:true});
-        prediction.length.should.eql(5);
-    });
-
-    it('13C chemical shift prediction expanded', function () {
-        var predictor = new lib.NmrPredictor1D({"C": db13C});
-        var prediction = predictor.carbon(molfile);
-        prediction.length.should.eql(8);
-    });
-
-    it('13C chemical shift prediction grouped', function () {
-        var predictor = new lib.NmrPredictor1D({"C": db13C});
-        var prediction = predictor.carbon(molfile, {group:true});
-        prediction.length.should.eql(6);
+describe('URL JSON 13C prediction', function () {
+    this.timeout(10000);
+    it('13C chemical shift prediction expanded', function (done) {
+        fetch('https://raw.githubusercontent.com/cheminfo-js/nmr-predictor/master/data/nmrshiftdb2.json', {
+            method: 'GET',
+            timeout: 10000
+        }).then(value => {return value.text()}).then(body => {
+            const db13C = JSON.parse(body);
+            var predictor = new NmrPredictor({"C": db13C});
+            var prediction = predictor.carbon(molfile, {group:true});
+            prediction.length.should.eql(6);
+            done();
+        });
     });
 });

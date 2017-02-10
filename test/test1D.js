@@ -1,11 +1,10 @@
 'use strict';
 
-const lib = require('..');
-const request = require('request');
+const NmrPredictor = require('..');
 const fs = require('fs');
 
-const db1H = JSON.parse(fs.readFileSync(__dirname + "/../data/h1.json").toString());
-const db13C = JSON.parse(fs.readFileSync(__dirname + "/../data/nmrshiftdb2.json").toString());
+const db1H = JSON.parse(fs.readFileSync(__dirname + '/../data/h1.json').toString());
+const db13C = JSON.parse(fs.readFileSync(__dirname + '/../data/nmrshiftdb2.json').toString());
 
 
 
@@ -34,14 +33,14 @@ M  END
 
 describe('Spinus prediction', function () {
     it('1H chemical shift prediction expanded', function (done) {
-            var predictor = new lib.NmrPredictor1D("spinus");
+            var predictor = new NmrPredictor('spinus');
             predictor.spinus(molfile).then(prediction => {
                 prediction.length.should.eql(10);
                 done();
             });
     });
     it('1H chemical shift prediction grouped', function (done) {
-        var predictor = new lib.NmrPredictor1D("spinus");
+        var predictor = new NmrPredictor('spinus');
         predictor.spinus(molfile, {group:true}).then(prediction => {
             prediction.length.should.eql(5);
             done()
@@ -52,25 +51,25 @@ describe('Spinus prediction', function () {
 
 describe('HOSE assignment prediction', function () {
     it('1H chemical shift prediction expanded', function () {
-        var predictor = new lib.NmrPredictor1D({"H": db1H});
+        var predictor = new NmrPredictor({'H': db1H});
         var prediction = predictor.proton(molfile);
         prediction.length.should.eql(10);
     });
 
     it('1H chemical shift prediction grouped', function () {
-        var predictor = new lib.NmrPredictor1D({"H": db1H});
+        var predictor = new NmrPredictor({'H': db1H});
         var prediction = predictor.proton(molfile, {group:true});
         prediction.length.should.eql(5);
     });
 
     it('13C chemical shift prediction expanded', function () {
-        var predictor = new lib.NmrPredictor1D({"C": db13C});
+        var predictor = new NmrPredictor({'C': db13C});
         var prediction = predictor.carbon(molfile);
         prediction.length.should.eql(8);
     });
 
     it('13C chemical shift prediction grouped', function () {
-        var predictor = new lib.NmrPredictor1D({"C": db13C});
+        var predictor = new NmrPredictor({'C': db13C});
         var prediction = predictor.carbon(molfile, {group:true});
         prediction.length.should.eql(6);
     });
