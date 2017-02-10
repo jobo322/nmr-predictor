@@ -34,7 +34,7 @@ describe('2D prediction', function () {
     this.timeout(1000);
     it('COSY', function (done) {
         var predictor = new NmrPredictor({'H': db1H,'C': db13C});
-        var h1 = predictor.proton(molfile);
+        var h1 = predictor.protonSync(molfile);
         predictor.towD(h1, h1, molfile, {minLength: 1, maxLength: 3}).then(prediction => {
             let count = 0;
             prediction.forEach(element => {
@@ -71,8 +71,8 @@ describe('2D prediction', function () {
     });
     it('HSQC', function (done) {
         var predictor = new NmrPredictor({'H': db1H,'C': db13C});
-        var c13 = predictor.carbon(molfile);
-        var h1 = predictor.proton(molfile);
+        var c13 = predictor.carbonSync(molfile);
+        var h1 = predictor.protonSync(molfile);
         predictor.towD(h1, c13, molfile, {minLength: 1, maxLength: 4}).then(prediction => {
             prediction.length.should.eql(24);
             done();

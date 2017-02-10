@@ -28,10 +28,10 @@ class NmrPredictor {
         }
         let opt = Object.assign({}, defaultOptions, options);
 
-        return _fromSpinus(mol, opt).then(pred => group(pred, opt));
+        return group(_fromSpinus(mol, opt), opt);
     }
 
-    proton(molfile, options) {
+    protonSync(molfile, options) {
         if(!this.db) {
             this.db = {"H": fetchDB("H")};
         }
@@ -45,7 +45,14 @@ class NmrPredictor {
         return group(_queryByHose(mol, this.db, opt), opt);
     }
 
-    carbon(molfile, options) {
+    proton(molfile, options) {
+        let that_= this;
+        return new Promise(function(resolve, reject){
+            resolve(that.protonSync(molfile, options));
+        });
+    }
+
+    carbonSync(molfile, options) {
         if(!this.db) {
             this.db = {"C": fetchDB("C")};
         }
@@ -55,10 +62,30 @@ class NmrPredictor {
             mol.addImplicitHydrogens();
         }
         let opt = Object.assign({}, defaultOptions, options, {atomLabel: "C"});
+
         return group(_queryByHose(mol, this.db, opt), opt);
     }
 
-    towD(dim1, dim2, molfile, opt) {
+    carbon(molfile, options) {
+        let that_= this;
+        return new Promise(function(resolve, reject){
+            try{
+                resolve(that.carbonSync(molfile, options));
+            }
+            catch(error) {
+                reject();
+            }
+        });
+    }
+
+    twoD(dim1, dim2, molfile, opt) {
+        var that_= this;
+        return new Promise(function(resolve, reject) {
+            resolve(that.towDSync(dim1, dim2, molfile, opt));
+        });
+    }
+
+    towDSync(dim1, dim2, molfile, opt) {
         let mol = molfile;
         let fromAtomLabel = '';
         let toAtomLabel = '';
@@ -98,9 +125,7 @@ class NmrPredictor {
             element.j = getCouplingConstant(idMap1, element.fromDiaID, element.toDiaID);
         });
 
-        return new Promise(function(resolve, reject){
-            resolve(paths);
-        });
+        return paths;
     }
 }
 

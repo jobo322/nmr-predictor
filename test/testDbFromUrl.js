@@ -33,9 +33,10 @@ describe('URL JSON 1H prediction', function () {
         }).then(value => {return value.text()}).then(body => {
             const db1H = JSON.parse(body);
             var predictor = new NmrPredictor({"H": db1H});
-            var prediction = predictor.proton(molfile, {group:true});
-            prediction.length.should.eql(5);
-            done();
+            predictor.proton(molfile, {group:true}).then(prediction => {
+                prediction.length.should.eql(5);
+                done();
+            });
         });
     });
 });
@@ -49,9 +50,10 @@ describe('URL JSON 13C prediction', function () {
         }).then(value => {return value.text()}).then(body => {
             const db13C = JSON.parse(body);
             var predictor = new NmrPredictor({"C": db13C});
-            var prediction = predictor.carbon(molfile, {group:true});
-            prediction.length.should.eql(6);
-            done();
+            predictor.carbon(molfile, {group:true}).then(prediction => {
+                prediction.length.should.eql(6);
+                done();
+            });
         });
     });
 });

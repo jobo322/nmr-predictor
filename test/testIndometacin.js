@@ -70,13 +70,17 @@ M  END
 describe('Ask Erno prediction indometacin', function () {
     it('1H chemical shift prediction no labile', function () {
         var predictor = new NmrPredictor({"H": db});
-        var prediction = predictor.proton(molfile);
-        prediction.length.should.eql(15);
+        var prediction = predictor.proton(molfile).then(prediction => {
+            prediction.length.should.eql(15);
+            done();
+        });
     });
 
     it('1H chemical shift prediction with labile', function () {
         var predictor = new NmrPredictor({"H": db});
-        var prediction = predictor.proton(molfile, {ignoreLabile: false});
-        prediction.length.should.eql(16);
+        predictor.proton(molfile, {ignoreLabile: false}).then(prediction => {
+            prediction.length.should.eql(16);
+            done();
+        });
     });
 });

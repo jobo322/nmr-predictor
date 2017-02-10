@@ -41,7 +41,7 @@ describe('Spinus prediction', function () {
     });
     it('1H chemical shift prediction grouped', function (done) {
         var predictor = new NmrPredictor('spinus');
-        predictor.spinus(molfile, {group:true}).then(prediction => {
+        predictor.spinus(molfile, {group: true}).then(prediction => {
             prediction.length.should.eql(5);
             done()
         });
@@ -50,27 +50,35 @@ describe('Spinus prediction', function () {
 
 
 describe('HOSE assignment prediction', function () {
-    it('1H chemical shift prediction expanded', function () {
+    it('1H chemical shift prediction expanded', function (done) {
         var predictor = new NmrPredictor({'H': db1H});
-        var prediction = predictor.proton(molfile);
-        prediction.length.should.eql(10);
+        predictor.proton(molfile).then(prediction => {
+            prediction.length.should.eql(10);
+            done();
+        });
     });
 
-    it('1H chemical shift prediction grouped', function () {
+    it('1H chemical shift prediction grouped', function (done) {
         var predictor = new NmrPredictor({'H': db1H});
-        var prediction = predictor.proton(molfile, {group:true});
-        prediction.length.should.eql(5);
+        predictor.proton(molfile, {group:true}).then(prediction => {
+            prediction.length.should.eql(5);
+            done();
+        });
     });
 
-    it('13C chemical shift prediction expanded', function () {
+    it('13C chemical shift prediction expanded', function (done) {
         var predictor = new NmrPredictor({'C': db13C});
-        var prediction = predictor.carbon(molfile);
-        prediction.length.should.eql(8);
+        predictor.carbon(molfile).then(prediction => {
+            prediction.length.should.eql(8);
+            done();
+        });
     });
 
-    it('13C chemical shift prediction grouped', function () {
+    it('13C chemical shift prediction grouped', function (done) {
         var predictor = new NmrPredictor({'C': db13C});
-        var prediction = predictor.carbon(molfile, {group:true});
-        prediction.length.should.eql(6);
+        predictor.carbon(molfile, {group:true}).then(prediction => {
+            prediction.length.should.eql(6);
+            done();
+        });
     });
 });
