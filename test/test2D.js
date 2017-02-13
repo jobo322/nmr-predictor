@@ -35,7 +35,7 @@ describe('2D prediction', function () {
     it('COSY', function (done) {
         var predictor = new NmrPredictor({'H': db1H,'C': db13C});
         var h1 = predictor.protonSync(molfile);
-        predictor.towD(h1, h1, molfile, {minLength: 1, maxLength: 3}).then(prediction => {
+        predictor.twoD(h1, h1, molfile, {minLength: 1, maxLength: 3}).then(prediction => {
             let count = 0;
             prediction.forEach(element => {
                 if(element.fromDiaID === "did@`@f\\bbRaih@J@A~dHBIU@"
@@ -73,7 +73,7 @@ describe('2D prediction', function () {
         var predictor = new NmrPredictor({'H': db1H,'C': db13C});
         var c13 = predictor.carbonSync(molfile);
         var h1 = predictor.protonSync(molfile);
-        predictor.towD(h1, c13, molfile, {minLength: 1, maxLength: 4}).then(prediction => {
+        predictor.twoD(h1, c13, molfile, {minLength: 1, maxLength: 4}).then(prediction => {
             prediction.length.should.eql(24);
             done();
         });

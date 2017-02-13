@@ -36,8 +36,8 @@ describe('URL JSON 1H prediction', function () {
             predictor.proton(molfile, {group:true}).then(prediction => {
                 prediction.length.should.eql(5);
                 done();
-            });
-        });
+            }).catch(reason => {return new Error(reason)});
+        }).catch(reason => {return new Error(reason)});
     });
 });
 
@@ -53,7 +53,7 @@ describe('URL JSON 13C prediction', function () {
             predictor.carbon(molfile, {group:true}).then(prediction => {
                 prediction.length.should.eql(6);
                 done();
-            });
-        });
+            }).catch(reason => {return new Error(reason)});
+        }).catch(reason => {return new Error(reason)});
     });
 });

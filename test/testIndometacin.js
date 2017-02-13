@@ -73,7 +73,7 @@ describe('Ask Erno prediction indometacin', function () {
         var prediction = predictor.proton(molfile).then(prediction => {
             prediction.length.should.eql(15);
             done();
-        });
+        }).catch(reason => {return new Error(reason)});
     });
 
     it('1H chemical shift prediction with labile', function () {
@@ -81,6 +81,6 @@ describe('Ask Erno prediction indometacin', function () {
         predictor.proton(molfile, {ignoreLabile: false}).then(prediction => {
             prediction.length.should.eql(16);
             done();
-        });
+        }).catch(reason => {return new Error(reason)});
     });
 });

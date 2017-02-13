@@ -28,7 +28,7 @@ class NmrPredictor {
         }
         let opt = Object.assign({}, defaultOptions, options);
 
-        return group(_fromSpinus(mol, opt), opt);
+        return fromSpinus(mol, opt).then(prediction => {return group(prediction, opt)});
     }
 
     protonSync(molfile, options) {
@@ -42,13 +42,13 @@ class NmrPredictor {
         }
         let opt = Object.assign({}, defaultOptions, options, {atomLabel: "H"});
 
-        return group(_queryByHose(mol, this.db, opt), opt);
+        return group(queryByHose(mol, this.db, opt), opt);
     }
 
     proton(molfile, options) {
-        let that_= this;
+        let result = this.protonSync(molfile, options);
         return new Promise(function(resolve, reject){
-            resolve(that.protonSync(molfile, options));
+            resolve(result);
         });
     }
 
@@ -63,25 +63,20 @@ class NmrPredictor {
         }
         let opt = Object.assign({}, defaultOptions, options, {atomLabel: "C"});
 
-        return group(_queryByHose(mol, this.db, opt), opt);
+        return group(queryByHose(mol, this.db, opt), opt);
     }
 
     carbon(molfile, options) {
-        let that_= this;
+        let result = this.carbonSync(molfile, options);
         return new Promise(function(resolve, reject){
-            try{
-                resolve(that.carbonSync(molfile, options));
-            }
-            catch(error) {
-                reject();
-            }
+            resolve(result);
         });
     }
 
     twoD(dim1, dim2, molfile, opt) {
-        var that_= this;
+        var result = this.towDSync(dim1, dim2, molfile, opt);
         return new Promise(function(resolve, reject) {
-            resolve(that.towDSync(dim1, dim2, molfile, opt));
+            resolve(result);
         });
     }
 
@@ -166,7 +161,7 @@ function getCouplingConstant(idMap, fromDiaID, toDiaID) {
  * @param    molfile: string    A molfile content
  * @returns    +Object an array of NMRSignal1D
  */
-function _queryByHose(mol, db, options) {
+function queryByHose(mol, db, options) {
     var currentDB = null;
     const atomLabel = options.atomLabel || 'H';
     const use  = options.use;
@@ -183,7 +178,6 @@ function _queryByHose(mol, db, options) {
     levels.sort(function(a, b) {
         return b - a;
     });
-
     var diaIDs = mol.getGroupedDiastereotopicAtomIDs({atomLabel: atomLabel});
     var infoCOSY = [];//mol.getCouplings();
     if(couplings) {
@@ -221,7 +215,7 @@ function _queryByHose(mol, db, options) {
             k++;
         }
         if (res == null) {
-            res = { cs: -9999999, ncs: 0, std: 0, min: 0, max: 0 };//Default values
+            res = { cs: null, ncs: 0, std: 0, min: 0, max: 0 };//Default values
         }
         atom.atomLabel = atomLabel;
         atom.level = levels[k-1];
@@ -284,11 +278,10 @@ function _queryByHose(mol, db, options) {
             }
         }
     }
-
     return toReturn;
 }
 
-function _fromSpinus(mol, options){
+function fromSpinus(mol, options){
     let form = new FormData();
     form.append('molfile', mol.toMolfile());
 
@@ -297,7 +290,7 @@ function _fromSpinus(mol, options){
         body: form
     }).then(value => {return value.text()}).then(body => {
         //Convert to the ranges format and include the diaID for each atomID
-        const data = _spinusParser(body);
+        const data = spinusParser(body);
         const ids = data.ids;
         const jc = data.couplingConstants;
         const cs = data.chemicalShifts;
@@ -328,7 +321,6 @@ function _fromSpinus(mol, options){
 
         //Average the entries for the equivalent protons
         var idsKeys = Object.keys(ids);
-
         for (i = 0; i < nspins; i++) {
             tmpCS = csByOclID[atoms[idsKeys[i]]].cs / csByOclID[atoms[idsKeys[i]]].nc;
             result[i] = {atomIDs: [idsKeys[i]], diaIDs: [atoms[idsKeys[i]]], integral: integrals[i],
@@ -340,16 +332,17 @@ function _fromSpinus(mol, options){
                         'assignment': idsKeys[j],
                         'diaID': atoms[idsKeys[j]],
                         'coupling': jc[i][j],
-                        'multiplicity': _multiplicityToString(multiplicity[j])
+                        'multiplicity': multiplicityToString(multiplicity[j])
                     });
                 }
             }
         }
+
         return result;
     }).catch(ex => {return new Error('http request fail ' + ex)});
 }
 
-function _multiplicityToString(mul) {
+function multiplicityToString(mul) {
     switch(mul) {
         case 2:
             return 'd';
@@ -365,7 +358,7 @@ function _multiplicityToString(mul) {
     }
 }
 
-function _spinusParser(result){
+function spinusParser(result){
     var lines = result.split('\n');
     var nspins = lines.length - 1;
     var cs = new Array(nspins);

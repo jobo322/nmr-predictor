@@ -32,19 +32,20 @@ M  END
 `;
 
 describe('Spinus prediction', function () {
+    this.timeout(10000);
     it('1H chemical shift prediction expanded', function (done) {
             var predictor = new NmrPredictor('spinus');
             predictor.spinus(molfile).then(prediction => {
                 prediction.length.should.eql(10);
                 done();
-            });
+            }).catch(reason => {return new Error(reason)});
     });
     it('1H chemical shift prediction grouped', function (done) {
         var predictor = new NmrPredictor('spinus');
         predictor.spinus(molfile, {group: true}).then(prediction => {
             prediction.length.should.eql(5);
             done()
-        });
+        }).catch(reason => {return new Error(reason)});
     });
 });
 
@@ -55,7 +56,7 @@ describe('HOSE assignment prediction', function () {
         predictor.proton(molfile).then(prediction => {
             prediction.length.should.eql(10);
             done();
-        });
+        }).catch(reason => {return new Error(reason)});
     });
 
     it('1H chemical shift prediction grouped', function (done) {
@@ -63,7 +64,7 @@ describe('HOSE assignment prediction', function () {
         predictor.proton(molfile, {group:true}).then(prediction => {
             prediction.length.should.eql(5);
             done();
-        });
+        }).catch(reason => {return new Error(reason)});
     });
 
     it('13C chemical shift prediction expanded', function (done) {
@@ -71,7 +72,7 @@ describe('HOSE assignment prediction', function () {
         predictor.carbon(molfile).then(prediction => {
             prediction.length.should.eql(8);
             done();
-        });
+        }).catch(reason => {return new Error(reason)});
     });
 
     it('13C chemical shift prediction grouped', function (done) {
@@ -79,6 +80,6 @@ describe('HOSE assignment prediction', function () {
         predictor.carbon(molfile, {group:true}).then(prediction => {
             prediction.length.should.eql(6);
             done();
-        });
+        }).catch(reason => {return new Error(reason)});
     });
 });
