@@ -392,6 +392,6 @@ function spinusParser(result){
 
     return {ids, chemicalShifts: cs, integrals, couplingConstants: jc, multiplicity: newArray(nspins, 2)};
 
-}
+}e
 
-module.exports = NmrPredictor;
+module.exports = {NmrPredictor, fetch};
