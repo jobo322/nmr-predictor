@@ -1,5 +1,6 @@
 const Predictor = require('../index.js');
-const fetch = require('node-fetch');
+require('es6-promise').polyfill();
+require('isomorphic-fetch');
 var molfile = `
 Actelion Java MolfileCreator 1.0
 

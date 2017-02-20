@@ -1,10 +1,11 @@
 'use strict';
 
 const NmrPredictor = require('..');
-const request = require('request');
+require('es6-promise').polyfill();
+require('isomorphic-fetch');
 const fs = require('fs');
 
-const db = JSON.parse(fs.readFileSync(__dirname + "/../data/h1.json").toString());
+const db = JSON.parse(fs.readFileSync(__dirname + "/../../data/h1.json").toString());
 
 
 const molfile = `

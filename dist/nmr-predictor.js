@@ -1907,7 +1907,7 @@ module.exports = g;
 // shim for using process in browser
 var process = module.exports = {};
 
-// cached from whatever global is present so that __test__ runners that stub it
+// cached from whatever global is present so that __tests__ runners that stub it
 // don't break things.  But we need to wrap it in a try catch in case it is
 // wrapped in strict mode code which doesn't define any globals.  It's inside a
 // function because try/catches deoptimize in certain engines.
@@ -5512,7 +5512,7 @@ Url.prototype.parse = function(url, parseQueryString, slashesDenoteHost) {
     // http://a@b?@c => user:a host:c path:/?@c
 
     // v0.12 TODO(isaacs): This is not quite how Chrome does things.
-    // Review our __test__ case against browsers more comprehensively.
+    // Review our __tests__ case against browsers more comprehensively.
 
     // find the first instance of any hostEndingChars
     var hostEnd = -1;
@@ -5586,7 +5586,7 @@ Url.prototype.parse = function(url, parseQueryString, slashesDenoteHost) {
               newpart += part[j];
             }
           }
-          // we __test__ again with ASCII char only
+          // we __tests__ again with ASCII char only
           if (!newpart.match(hostnamePartPattern)) {
             var validParts = hostparts.slice(0, i);
             var notHost = hostparts.slice(i + 1);
@@ -17742,7 +17742,7 @@ module.exports = __webpack_require__(27)
     }
 
     function canUsePostMessage() {
-        // The __test__ against `importScripts` prevents this implementation from being installed inside a web worker,
+        // The __tests__ against `importScripts` prevents this implementation from being installed inside a web worker,
         // where `global.postMessage` means something completely different and can't be used for this purpose.
         if (global.postMessage && !global.importScripts) {
             var postMessageIsAsynchronous = true;
@@ -18536,7 +18536,7 @@ assert.fail = fail;
 // by !!guard.
 // assert.ok(guard, message_opt);
 // This statement is equivalent to assert.equal(true, !!guard,
-// message_opt);. To __test__ strictly for the value true, use
+// message_opt);. To __tests__ strictly for the value true, use
 // assert.strictEqual(true, guard, message_opt);.
 
 function ok(value, message) {
@@ -18673,13 +18673,13 @@ function objEquiv(a, b, strict, actualVisitedObjects) {
   //the same set of keys (although not necessarily the same order),
   ka.sort();
   kb.sort();
-  //~~~cheap key __test__
+  //~~~cheap key __tests__
   for (i = ka.length - 1; i >= 0; i--) {
     if (ka[i] !== kb[i])
       return false;
   }
   //equivalent values for every corresponding key, and
-  //~~~possibly expensive deep __test__
+  //~~~possibly expensive deep __tests__
   for (i = ka.length - 1; i >= 0; i--) {
     key = ka[i];
     if (!_deepEqual(a[key], b[key], strict, actualVisitedObjects))
@@ -38740,7 +38740,7 @@ function inflateResetKeep(strm) {
   state = strm.state;
   strm.total_in = strm.total_out = state.total = 0;
   strm.msg = ''; /*Z_NULL*/
-  if (state.wrap) {       /* to support ill-conceived Java __test__ suite */
+  if (state.wrap) {       /* to support ill-conceived Java __tests__ suite */
     strm.adler = state.wrap & 1;
   }
   state.mode = HEAD;
@@ -41556,7 +41556,7 @@ function _tr_flush_block(s, buf, stored_len, last)
   if ((stored_len + 4 <= opt_lenb) && (buf !== -1)) {
     /* 4: two words for the lengths */
 
-    /* The __test__ buf != NULL is only necessary if LIT_BUFSIZE > WSIZE.
+    /* The __tests__ buf != NULL is only necessary if LIT_BUFSIZE > WSIZE.
      * Otherwise we can't have processed more than WSIZE input bytes since
      * the last block flush, because compression would have been
      * successful. If LIT_BUFSIZE <= WSIZE, it is never too late to

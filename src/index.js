@@ -5,7 +5,8 @@
 const OCLE = require('openchemlib-extended');
 const Matrix = require('ml-matrix');
 const newArray = require('new-array');
-const fetch = require('node-fetch');
+require('es6-promise').polyfill();
+require('isomorphic-fetch');
 const FormData = require('form-data');
 
 const defaultOptions = {atomLabel:'H', ignoreLabile: true, use: 'median'};
@@ -394,4 +395,4 @@ function spinusParser(result){
 
 }
 
-module.exports = {NmrPredictor, fetch};
+module.exports = NmrPredictor;
