@@ -43,7 +43,7 @@ describe('URL JSON 1H prediction', function () {
 });
 
 describe('URL JSON 13C prediction', function () {
-    this.timeout(20000);
+    this.timeout(10000);
     it('13C chemical shift prediction expanded', function (done) {
         fetch('https://raw.githubusercontent.com/cheminfo-js/nmr-predictor/master/data/nmrshiftdb2.json', {
             method: 'GET',
@@ -56,5 +56,13 @@ describe('URL JSON 13C prediction', function () {
                 done();
             }).catch(reason => {return new Error(reason)});
         }).catch(reason => {return new Error(reason)});
+    });
+
+    it('13C chemical shift prediction grouped', function (done) {
+        var predictor = new NmrPredictor();
+        predictor.carbon(molfile, {group:false}).then(prediction => {
+                prediction.length.should.eql(8);
+                done();
+            }).catch(reason => {return new Error(reason)});
     });
 });

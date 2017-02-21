@@ -47,16 +47,24 @@ class NmrPredictor {
     }
 
     proton(molfile, options) {
-        let result = this.protonSync(molfile, options);
-        return new Promise(function(resolve, reject){
-            resolve(result);
-        });
+        if(!this.db)
+            this.db = {};
+
+        if(!this.db['H']) {
+            return fetch('https://raw.githubusercontent.com/cheminfo-js/nmr-predictor/master/data/h1.json', {timeout: 5000})
+                .then(value => {return value.text()}).then(body => {
+                    this.db['H'] = JSON.parse(body);
+                    return this.protonSync(molfile, options);
+                });
+        } else {
+            let result = this.protonSync(molfile, options);
+            return new Promise(function(resolve, reject){
+                resolve(result);
+            });
+        }
     }
 
     carbonSync(molfile, options) {
-        if(!this.db) {
-            this.db = {"C": fetchDB("C")};
-        }
         var mol = molfile;
         if(typeof molfile === 'string') {
             mol = OCLE.Molecule.fromMolfile(molfile);
@@ -68,10 +76,23 @@ class NmrPredictor {
     }
 
     carbon(molfile, options) {
-        let result = this.carbonSync(molfile, options);
-        return new Promise(function(resolve, reject){
-            resolve(result);
-        });
+
+        if(!this.db)
+            this.db = {};
+
+        if(!this.db['C']) {
+            return fetch('https://raw.githubusercontent.com/cheminfo-js/nmr-predictor/master/data/nmrshiftdb2.json',
+                {timeout: 20000})
+                .then(value => {return value.text()}).then(body => {
+                    this.db['C'] = JSON.parse(body);
+                    return this.carbonSync(molfile, options);
+                });
+        } else {
+            let result = this.carbonSync(molfile, options);
+            return new Promise(function(resolve, reject){
+                resolve(result);
+            });
+        }
     }
 
     twoD(dim1, dim2, molfile, opt) {

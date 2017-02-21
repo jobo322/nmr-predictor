@@ -45,7 +45,6 @@ M  END
 `;
 
 var predictor = new Predictor('spinus');
-debugger;
 predictor.spinus(molfile).then(prediction => {
     //var a = simule2DNmrSpectrum(prediction, {nbPointsX: 100, nbPointsY: 100});
     console.log(prediction)
