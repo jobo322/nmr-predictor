@@ -43,8 +43,25 @@ Copyright by the U.S. Sec. Commerce on behalf of U.S.A. All rights reserved.
 M  END
 `;
 
+// 1D proton prediction
 predictor.fetchProton().then(function () {
     console.log(predictor.proton(molfile));
+});
+
+// 2D HSQC prediction
+Promise.all([
+  predictor.fetchProton(),
+  predictor.fetchCarbon()
+]).then(function (dbs) {
+  return predictor.twod(predictor.proton(molfile), predictor.carbon(molfile), molfile);
+});
+
+// 2D HSQC with spinus
+Promise.all([
+  predictor.spinus(molfile),
+  predictor.fetchCarbon()
+]).then(function (results) {
+  return predictor.twod(results[0], predictor.carbon(molfile), molfile);
 });
 ```
 
