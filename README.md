@@ -15,12 +15,10 @@ $ npm install nmr-predictor
 
 ## Example
 
-``` js
+```js
 'use strict';
 
-const NmrPredictor = require('..');
-const request = require('request');
-const fs = require('fs');
+const predictor = require('..');
 
 const molfile = `Benzene, ethyl-, ID: C100414
   NIST    16081116462D 1   1.00000     0.00000
@@ -45,21 +43,20 @@ Copyright by the U.S. Sec. Commerce on behalf of U.S.A. All rights reserved.
 M  END
 `;
 
-
-var predictor = new NmrPredictor("spinus");
-predictor.predict(molfile).then(prediction => {
-            console.log(prediction);
+predictor.fetchProton().then(function () {
+    console.log(predictor.proton(molfile));
 });
+```
 
 ## License
 
   [MIT](./LICENSE)
 
-[npm-image]: https://img.shields.io/npm/v/cheminfo-nmr-predictor.svg?style=flat-square
-[npm-url]: https://www.npmjs.com/package/cheminfo-nmr-predictor
+[npm-image]: https://img.shields.io/npm/v/nmr-predictor.svg?style=flat-square
+[npm-url]: https://www.npmjs.com/package/nmr-predictor
 [travis-image]: https://img.shields.io/travis/cheminfo-js/nmr-predictor/master.svg?style=flat-square
 [travis-url]: https://travis-ci.org/cheminfo-js/nmr-predictor
 [david-image]: https://img.shields.io/david/cheminfo-js/nmr-predictor.svg?style=flat-square
 [david-url]: https://david-dm.org/cheminfo-js/nmr-predictor
-[download-image]: https://img.shields.io/npm/dm/cheminfo-nmr-predictor.svg?style=flat-square
-[download-url]: https://www.npmjs.com/package/cheminfo-nmr-predictor
+[download-image]: https://img.shields.io/npm/dm/nmr-predictor.svg?style=flat-square
+[download-url]: https://www.npmjs.com/package/nmr-predictor
