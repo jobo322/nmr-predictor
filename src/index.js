@@ -22,13 +22,29 @@ function fetchCarbon(url = defaultCarbonUrl, dbName = 'carbon') {
 
 function fetch(url, dbName, type) {
     if (databases[dbName] && databases[dbName].type === type && databases[dbName].url === url) {
+        if (databases[dbName].fetching) {
+            return databases[dbName].fetching;
+        }
         return Promise.resolve(databases[dbName].db);
     }
-    return superagent.get(url).then((res) => {
+    const database = {
+        type,
+        url,
+        db: null,
+        fetching: null
+    };
+    databases[dbName] = database;
+    const fetching = superagent.get(url).then((res) => {
         const db = res.body ? res.body : JSON.parse(res.text);
-        databases[dbName] = {type, url, db};
+        database.db = db;
+        database.fetching = false;
         return db;
+    }).catch((e) => {
+        delete databases[dbName];
+        throw e;
     });
+    database.fetching = fetching;
+    return fetching;
 }
 
 function proton(molecule, options) {
@@ -50,6 +66,7 @@ function getDb(option, type) {
     if (typeof option !== 'string') throw new TypeError('database option must be a string or array');
     const db = databases[option];
     if (!db) throw new Error(`database ${option} does not exist. Did you forget to fetch it?`);
+    if (db.fetching) throw new Error(`database ${option} is not fetched yet`);
     if (db.type !== type) throw new Error(`database ${option} is of type ${db.type} instead of ${type}`);
     return db.db;
 }
