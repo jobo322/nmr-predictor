@@ -48,16 +48,16 @@ function fetch(url, dbName, type) {
 }
 
 function proton(molecule, options) {
+    options.atomLabel = 'H';
     [molecule, options] = normalizeOptions(molecule, options);
     const db = getDb(options.db || 'proton', 'proton');
-    options.atomLabel = 'H';
     return queryByHose(molecule, db, options);
 }
 
 function carbon(molecule, options) {
+    options.atomLabel = 'C';
     [molecule, options] = normalizeOptions(molecule, options);
     const db = getDb(options.db || 'carbon', 'carbon');
-    options.atomLabel = 'C';
     return queryByHose(molecule, db, options);
 }
 

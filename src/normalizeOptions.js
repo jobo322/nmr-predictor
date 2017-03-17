@@ -14,7 +14,14 @@ module.exports = function options(molecule, options) {
     } else if (!(molecule instanceof Molecule)) {
         throw new Error('molecule must be a molfile string or Molecule instance');
     }
-    molecule.addImplicitHydrogens();
     options = Object.assign({}, defaultOptions, options);
+    if(options.atomLabel === 'H'){
+        molecule.addImplicitHydrogens();
+    }
+    //@TODO Should be removed
+    if(options.atomLabel === 'C'){
+        molecule.removeExplicitHydrogens();
+    }
+
     return [molecule, options];
 };

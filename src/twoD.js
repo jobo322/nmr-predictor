@@ -4,7 +4,6 @@ const normalizeOptions = require('./normalizeOptions');
 
 module.exports = function twoD(dim1, dim2, molecule, options) {
     [molecule, options] = normalizeOptions(molecule, options);
-
     var fromAtomLabel = '';
     var toAtomLabel = '';
     if (dim1 && dim1.length > 0) {
