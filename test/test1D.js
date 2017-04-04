@@ -40,6 +40,11 @@ describe('Spinus prediction', function () {
         const prediction = await predictor.spinus(molfile, {group: true});
         prediction.length.should.equal(5);
     });
+    it('1H chemical shift prediction expanded from SMILES', async function () {
+        this.timeout(10000);
+        const prediction = await predictor.spinus('c1ccccc1CC');
+        prediction.length.should.equal(10);
+    });
 });
 
 describe('HOSE assignment prediction', function () {
