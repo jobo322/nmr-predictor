@@ -10,7 +10,11 @@ const defaultOptions = {
 
 module.exports = function options(molecule, options) {
     if (typeof molecule === 'string') {
-        molecule = Molecule.fromMolfile(molecule);
+        if (molecule.split(/[\r\n]+/).length > 2) {
+            molecule = Molecule.fromMolfile(molecule);
+        } else { // it is probably a SMILES
+            molecule = Molecule.fromSmiles(molecule);
+        }
     } else if (!(molecule instanceof Molecule)) {
         throw new Error('molecule must be a molfile string or Molecule instance');
     }

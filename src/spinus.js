@@ -76,6 +76,11 @@ function fromSpinus(molecule) {
                     });
                 }
             }
+
+            if (result[i].j.length === 0) {
+                result[i].multiplicity = 's';
+            }
+
         }
 
         return result;
