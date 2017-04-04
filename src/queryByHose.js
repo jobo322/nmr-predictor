@@ -28,8 +28,9 @@ module.exports = function queryByHose(molecule, db, options) {
             diaIDs: [diaIDs[j].oclID + '']
         };
         for (k = 0; k < levels.length; k++) {
-            if(hosesString[levels[k] - 1])
+            if (hosesString[levels[k] - 1]) {
                 atom['hose' + levels[k]] = hosesString[levels[k] - 1] + '';
+            }
         }
         for (k = diaIDs[j].atoms.length - 1; k >= 0; k--) {
             atoms[diaIDs[j].atoms[k]] = JSON.parse(JSON.stringify(atom));
@@ -54,7 +55,7 @@ module.exports = function queryByHose(molecule, db, options) {
             res = {cs: null, ncs: 0, std: 0, min: 0, max: 0};//Default values
         }
         atom.atomLabel = atomLabel;
-        atom.level = levels[k-1];
+        atom.level = levels[k - 1];
         atom.delta = res.cs;
         if (use === 'median' && res.median) {
             atom.delta = res.median;

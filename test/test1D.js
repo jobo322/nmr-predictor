@@ -42,6 +42,11 @@ describe('Spinus prediction', function () {
     });
     it('1H chemical shift prediction expanded from SMILES', async function () {
         this.timeout(10000);
+        const prediction = await predictor.spinus('c1ccccc1');
+        prediction.length.should.equal(6);
+    });
+    it('1H chemical shift prediction expanded from SMILES', async function () {
+        this.timeout(10000);
         const prediction = await predictor.spinus('c1ccccc1CC');
         prediction.length.should.equal(10);
     });
