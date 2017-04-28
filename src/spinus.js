@@ -79,6 +79,10 @@ function fromSpinus(molecule) {
 
             if (result[i].j.length === 0) {
                 result[i].multiplicity = 's';
+            } else {
+                result[i].j.sort((a, b) => {
+                    return b.coupling - a.coupling;
+                });
             }
 
         }
